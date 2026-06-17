@@ -263,13 +263,31 @@ class CreateTicket < ActiveRecord::Migration[4.2]
       t.column :out_of_office,        :boolean,                null: false, default: false
       t.column :view,                 :string, limit: 1000, null: false
       t.column :active,               :boolean,                null: false, default: true
+      t.column :folder_id,            :integer,                null: true
       t.column :updated_by_id,        :integer,                null: false
       t.column :created_by_id,        :integer,                null: false
       t.timestamps limit: 3, null: false
     end
     add_index :overviews, [:name]
+    add_index :overviews, [:folder_id]
     add_foreign_key :overviews, :users, column: :created_by_id
     add_foreign_key :overviews, :users, column: :updated_by_id
+
+    create_table :overview_folders do |t|
+      t.column :name,          :string,  limit: 250, null: false
+      t.column :parent_id,     :integer,             null: true
+      t.column :prio,          :integer,             null: false
+      t.column :active,        :boolean,             null: false, default: true
+      t.column :updated_by_id, :integer,             null: false
+      t.column :created_by_id, :integer,             null: false
+      t.timestamps limit: 3, null: false
+    end
+    add_index :overview_folders, [:name]
+    add_index :overview_folders, [:parent_id]
+    add_foreign_key :overview_folders, :overview_folders, column: :parent_id
+    add_foreign_key :overview_folders, :users, column: :created_by_id
+    add_foreign_key :overview_folders, :users, column: :updated_by_id
+    add_foreign_key :overviews, :overview_folders, column: :folder_id
 
     create_table :overviews_roles, id: false do |t|
       t.references :overview

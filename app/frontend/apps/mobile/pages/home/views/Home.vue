@@ -40,17 +40,45 @@ const menu: MenuItem[] = [
 
 const overviews = useTicketOverviews()
 
-const ticketOverview = computed<MenuItem[]>(() => {
+const buildOverviewItem = (
+  overview: (typeof overviews.includedOverviews)[number],
+): MenuItem => ({
+  type: 'link',
+  link: `/tickets/view/${overview.link}`,
+  label: overview.name,
+  information: overview.ticketCount,
+})
+
+const overviewFolderPath = (
+  overview: (typeof overviews.includedOverviews)[number],
+): string[] | undefined =>
+  overview.folderId ? overviews.folderPathById[overview.folderId] : undefined
+
+// Favorites that do not sit inside a (visible) folder are shown at the top.
+const rootOverviewItems = computed<MenuItem[]>(() => {
   if (overviews.loading) return []
 
-  return overviews.includedOverviews.map((overview) => {
-    return {
-      type: 'link',
-      link: `/tickets/view/${overview.link}`,
-      label: overview.name,
-      information: overview.ticketCount,
-    }
+  return overviews.includedOverviews
+    .filter((overview) => !overviewFolderPath(overview))
+    .map(buildOverviewItem)
+})
+
+// Favorites that live inside a folder are grouped under their folder path.
+const folderOverviewGroups = computed<{ path: string; items: MenuItem[] }[]>(() => {
+  if (overviews.loading) return []
+
+  const groups = new Map<string, { path: string; items: MenuItem[] }>()
+
+  overviews.includedOverviews.forEach((overview) => {
+    const path = overviewFolderPath(overview)
+    if (!path) return
+
+    const key = path.join(' / ')
+    if (!groups.has(key)) groups.set(key, { path: key, items: [] })
+    groups.get(key)!.items.push(buildOverviewItem(overview))
   })
+
+  return [...groups.values()].sort((a, b) => a.path.localeCompare(b.path))
 })
 </script>
 
@@ -64,18 +92,25 @@ const ticketOverview = computed<MenuItem[]>(() => {
       <CommonInputSearch aria-hidden="true" tabindex="-1" wrapper-class="mb-4" no-border />
     </CommonLink>
     <CommonSectionMenu :items="menu" />
-    <CommonSectionMenu
-      v-if="session.hasPermission(['ticket.agent', 'ticket.customer'])"
-      :items="ticketOverview"
-      :header-label="__('Ticket overview')"
-      :action-label="__('Edit')"
-      action-link="/favorite/ticket-overviews/edit"
-    >
-      <template v-if="overviews.loading" #before-items>
-        <div class="flex w-full justify-center">
-          <CommonIcon name="loading" animation="spin" />
-        </div>
-      </template>
-    </CommonSectionMenu>
+    <template v-if="session.hasPermission(['ticket.agent', 'ticket.customer'])">
+      <CommonSectionMenu
+        :items="rootOverviewItems"
+        :header-label="__('Ticket overview')"
+        :action-label="__('Edit')"
+        action-link="/favorite/ticket-overviews/edit"
+      >
+        <template v-if="overviews.loading" #before-items>
+          <div class="flex w-full justify-center">
+            <CommonIcon name="loading" animation="spin" />
+          </div>
+        </template>
+      </CommonSectionMenu>
+      <CommonSectionMenu
+        v-for="group in folderOverviewGroups"
+        :key="group.path"
+        :items="group.items"
+        :header-label="group.path"
+      />
+    </template>
   </div>
 </template>

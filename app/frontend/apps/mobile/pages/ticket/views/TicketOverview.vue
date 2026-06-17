@@ -29,13 +29,22 @@ const props = defineProps<{
 const router = useRouter()
 const route = useRoute()
 
-const { overviews, loading: loadingOverviews } = storeToRefs(useTicketOverviews())
+const {
+  overviews,
+  folderPathById,
+  loading: loadingOverviews,
+} = storeToRefs(useTicketOverviews())
 
 const optionsOverviews = computed(() => {
-  return overviews.value.map((overview) => ({
-    value: overview.link,
-    label: `${i18n.t(overview.name)} (${overview.ticketCount})`,
-  }))
+  return overviews.value.map((overview) => {
+    const folderPath = overview.folderId ? folderPathById.value[overview.folderId] : undefined
+    const prefix = folderPath?.length ? `${folderPath.map((name) => i18n.t(name)).join(' / ')}: ` : ''
+
+    return {
+      value: overview.link,
+      label: `${prefix}${i18n.t(overview.name)} (${overview.ticketCount})`,
+    }
+  })
 })
 
 const selectedOverview = computed(() => {

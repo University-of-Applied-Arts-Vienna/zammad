@@ -47,6 +47,10 @@ returns
       end
       data = assets_of_selector('condition', data)
 
+      if folder_id && (local_folder = OverviewFolder.lookup(id: folder_id))
+        data = local_folder.assets(data)
+      end
+
       %w[created_by_id updated_by_id].each do |local_user_id|
         next if !self[ local_user_id ]
         next if data[ app_model_user ][ self[ local_user_id ] ]

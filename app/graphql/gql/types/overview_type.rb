@@ -23,6 +23,8 @@ module Gql::Types
     # field :view, String, null: false
     field :active, Boolean, null: false
 
+    field :folder_id, Integer, null: true, description: 'Internal ID of the folder this overview belongs to, if any'
+
     field :view_columns_raw, [String, { null: false }], null: false, description: 'Columns to be shown on screen, mapped to actual internal field IDs'
     field :view_columns, [Gql::Types::KeyValueType, { null: false }], null: false, description: 'Columns to be shown on screen, with assigned label values'
     field :order_columns, [Gql::Types::KeyValueType, { null: false }], null: false, description: 'Columns that may be used as order_by of overview queries, with assigned label values'

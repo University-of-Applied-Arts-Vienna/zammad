@@ -1,10 +1,11 @@
 class App.Overview extends App.Model
-  @configure 'Overview', 'name', 'prio', 'condition', 'order', 'group_by', 'group_direction', 'view', 'user_ids', 'organization_shared', 'out_of_office', 'role_ids', 'active'
+  @configure 'Overview', 'name', 'prio', 'condition', 'order', 'group_by', 'group_direction', 'view', 'user_ids', 'organization_shared', 'out_of_office', 'role_ids', 'folder_id', 'active'
   @extend Spine.Model.Ajax
   @url: @apiPath + '/overviews'
   @configure_attributes = [
     { name: 'name',       display: __('Name'),                tag: 'input',    type: 'text', translate: true, limit: 100, 'null': false },
     { name: 'link',       display: __('Link'),                readonly: 1 },
+    { name: 'folder_id',  display: __('Folder'),              tag: 'select', multiple: false, null: true, relation: 'OverviewFolder', nulloption: true },
     { name: 'role_ids',   display: __('Available for the following roles'),    tag: 'column_select', multiple: true, null: false, relation: 'Role', translate: true },
     { name: 'user_ids',   display: __('Restrict to only the following users'), tag: 'column_select', multiple: true, null: true,  relation: 'User', sortBy: 'firstname' },
     { name: 'organization_shared', display: __('Only available for users with shared organizations'), tag: 'select', options: { true: 'yes', false: 'no' }, translate: true, default: false, null: true },
@@ -75,6 +76,7 @@ class App.Overview extends App.Model
   @configure_overview = [
     'name',
     'link',
+    'folder_id',
     'role_ids',
     'prio',
   ]

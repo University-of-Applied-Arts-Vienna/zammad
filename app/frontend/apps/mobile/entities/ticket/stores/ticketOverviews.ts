@@ -11,6 +11,7 @@ import type {
   TicketOverviewUpdatesSubscription,
   TicketOverviewUpdatesSubscriptionVariables,
 } from '#shared/graphql/types.ts'
+import { useOverviewFoldersQuery } from '#shared/entities/ticket/graphql/queries/overviewFolders.api.ts'
 import { QueryHandler } from '#shared/server/apollo/handler/index.ts'
 
 import { useTicketOverviewsQuery } from '#mobile/entities/ticket/graphql/queries/overviews.api.ts'
@@ -18,7 +19,10 @@ import { TicketOverviewUpdatesDocument } from '#mobile/entities/ticket/graphql/s
 
 import { getTicketOverviewStorage } from '../helpers/ticketOverviewStorage.ts'
 
-export type TicketOverview = Pick<Overview, 'id' | 'name' | 'organizationShared' | 'outOfOffice'>
+export type TicketOverview = Pick<
+  Overview,
+  'id' | 'name' | 'organizationShared' | 'outOfOffice' | 'folderId'
+>
 
 export const useTicketOverviewsStore = defineStore('ticketOverviews', () => {
   const ticketOverviewHandler = new QueryHandler(
@@ -61,6 +65,35 @@ export const useTicketOverviewsStore = defineStore('ticketOverviews', () => {
 
   const overviewsByKey = computed(() => keyBy(overviews.value, 'id'))
 
+  // Folders grouping the overviews (only those visible to the current user).
+  const folderHandler = new QueryHandler(useOverviewFoldersQuery({ ignoreUserConditions: false }))
+  const foldersRaw = folderHandler.result()
+  const folders = computed(() => foldersRaw.value?.userCurrentTicketOverviewFolders || [])
+  const foldersById = computed(() => keyBy(folders.value, 'internalId'))
+
+  // Maps a folder's internal ID to its full name path from the root, e.g.
+  //   ['Team A', 'Open'].
+  const folderPathById = computed<Record<number, string[]>>(() => {
+    const result: Record<number, string[]> = {}
+
+    const buildPath = (folder: (typeof folders.value)[number]): string[] => {
+      if (result[folder.internalId]) return result[folder.internalId]
+
+      const parent =
+        folder.parentId && foldersById.value[folder.parentId]
+          ? foldersById.value[folder.parentId]
+          : undefined
+
+      const path = parent ? [...buildPath(parent), folder.name] : [folder.name]
+      result[folder.internalId] = path
+      return path
+    }
+
+    folders.value.forEach(buildPath)
+
+    return result
+  })
+
   const storage = getTicketOverviewStorage()
 
   const includedIds = ref(new Set<string>(storage.getOverviews()))
@@ -95,6 +128,8 @@ export const useTicketOverviewsStore = defineStore('ticketOverviews', () => {
 
   return {
     overviews,
+    folders,
+    folderPathById,
     initializing: ticketOverviewHandler.operationResult.forceDisabled.value,
     loading: overviewsLoading,
     includedOverviews,

@@ -14,7 +14,7 @@ class Overview extends App.ControllerSubContent
       id: @id
       genericObject: 'Overview'
       defaultSortBy: 'prio'
-      #groupBy: 'role'
+      groupBy: 'folder'
       searchBar: true
       searchQuery: @search_query
       pageData:
@@ -37,8 +37,9 @@ class Overview extends App.ControllerSubContent
         prios = []
         prio = 0
         for item in items
-          prio += 1
           id = $(item).data('id')
+          continue if !id # skip group-by header rows
+          prio += 1
           prios.push [id, prio]
 
         @ajax(
@@ -48,6 +49,12 @@ class Overview extends App.ControllerSubContent
           processData: true
           data:        JSON.stringify(prios: prios)
         )
+    )
+
+    # Preload all folders so the "Folder" select lists every folder and the
+    #   list can be grouped by the (full) folder path.
+    App.OverviewFolder.fetchFull(=>
+      @genericController.render()
     )
 
   show: (params) =>

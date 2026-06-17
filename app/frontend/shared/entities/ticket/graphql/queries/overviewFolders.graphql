@@ -1,0 +1,10 @@
+query overviewFolders($ignoreUserConditions: Boolean!) {
+  userCurrentTicketOverviewFolders(ignoreUserConditions: $ignoreUserConditions) {
+    id
+    internalId
+    name
+    prio
+    parentId
+    active
+  }
+}

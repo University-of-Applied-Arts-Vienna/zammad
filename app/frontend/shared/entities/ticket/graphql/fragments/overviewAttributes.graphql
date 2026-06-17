@@ -10,5 +10,6 @@ fragment overviewAttributes on Overview {
   organizationShared
   outOfOffice
   active
+  folderId
   ticketCount @include(if: $withTicketCount)
 }

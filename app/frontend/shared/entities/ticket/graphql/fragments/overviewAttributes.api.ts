@@ -14,6 +14,7 @@ export const OverviewAttributesFragmentDoc = gql`
   organizationShared
   outOfOffice
   active
+  folderId
   ticketCount @include(if: $withTicketCount)
 }
     `;

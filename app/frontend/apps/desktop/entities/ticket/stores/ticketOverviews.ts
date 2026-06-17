@@ -17,6 +17,7 @@ import { useAuthenticationStore } from '#shared/stores/authentication.ts'
 import { useSessionStore } from '#shared/stores/session.ts'
 
 import { useUserCurrentOverviewUpdateLastUsedMutation } from '#desktop/entities/ticket/graphql/mutations/userCurrentOverviewUpdateLastUsed.api.ts'
+import { useTicketOverviewFolders } from '#desktop/entities/ticket/stores/composables/useTicketOverviewFolders.ts'
 import { useTicketsCountByOverview } from '#desktop/entities/ticket/stores/composables/useTicketsCountByOverview.ts'
 import { useUserCurrentTicketOverviews } from '#desktop/entities/ticket/stores/composables/useUserCurrentTicketOverviews.ts'
 
@@ -108,6 +109,8 @@ export const useTicketOverviewsStore = defineStore('ticketOverviews', () => {
     currentTicketOverviewLink,
     setCurrentTicketOverviewLink,
   } = useUserCurrentTicketOverviews()
+
+  const { folders } = useTicketOverviewFolders()
 
   const overviewBackgroundPollingIds = computed<ID[]>((currentIds) => {
     if (
@@ -383,6 +386,7 @@ export const useTicketOverviewsStore = defineStore('ticketOverviews', () => {
   return {
     queryPollingConfig,
     overviews,
+    folders,
     overviewsTicketCountById,
     overviewsById,
     overviewsByLink,

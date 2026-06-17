@@ -20,6 +20,12 @@ done <<< "$CHANGED_FILES"
 
 EXIT_CODE=0
 
+# Gracefully skip when the toolchain is unavailable (e.g. minimal environments).
+if { $NEEDS_GRAPHQL || $NEEDS_SETTINGS; } && ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found — skipping type regeneration." >&2
+  exit 0
+fi
+
 if $NEEDS_GRAPHQL; then
   echo "GraphQL schema changed — regenerating types..." >&2
   pnpm generate-graphql-api >&2 || EXIT_CODE=2

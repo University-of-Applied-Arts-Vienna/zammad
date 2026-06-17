@@ -3365,6 +3365,32 @@ Setting.create_if_not_exists(
 )
 
 Setting.create_if_not_exists(
+  title:       __('New ticket for follow-up to a different group'),
+  name:        'postmaster_follow_up_new_ticket_for_different_group',
+  area:        'Email::Base',
+  description: __('If a follow-up is detected (e.g. via subject or References header) for a ticket that belongs to a different group than the receiving channel/address, create a new ticket in the receiving group instead of appending to the existing ticket.'),
+  options:     {
+    form: [
+      {
+        display: '',
+        null:    true,
+        name:    'postmaster_follow_up_new_ticket_for_different_group',
+        tag:     'boolean',
+        options: {
+          true  => 'yes',
+          false => 'no',
+        },
+      },
+    ],
+  },
+  state:       false,
+  preferences: {
+    permission: ['admin.channel_email', 'admin.channel_google', 'admin.channel_microsoft365', 'admin.channel_microsoft_graph'],
+  },
+  frontend:    false
+)
+
+Setting.create_if_not_exists(
   title:       __('Sender based on Reply-To header'),
   name:        'postmaster_sender_based_on_reply_to',
   area:        'Email::Base',
@@ -4353,6 +4379,15 @@ Setting.create_if_not_exists(
   description: __('Define postmaster filter to check if follow-ups get created (based on admin settings).'),
   options:     {},
   state:       'Channel::Filter::FollowUpPossibleCheck',
+  frontend:    false
+)
+Setting.create_if_not_exists(
+  title:       __('Defines postmaster filter.'),
+  name:        '0201_postmaster_filter_follow_up_group_check',
+  area:        'Postmaster::PreFilter',
+  description: __('Defines postmaster filter to create a new ticket in the receiving group if a follow-up is detected for a different group.'),
+  options:     {},
+  state:       'Channel::Filter::FollowUpGroupCheck',
   frontend:    false
 )
 Setting.create_if_not_exists(

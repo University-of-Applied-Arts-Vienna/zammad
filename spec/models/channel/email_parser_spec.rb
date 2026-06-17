@@ -1325,6 +1325,52 @@ RSpec.describe Channel::EmailParser, type: :model do
       end
     end
 
+    describe 'follow-up to a different group than the receiving address' do
+      let(:group_a) { create(:group) }
+      let(:group_b) { create(:group) }
+      let(:ticket)  { create(:ticket, group: group_a) }
+      let!(:article) do
+        create(:ticket_article, ticket: ticket, message_id: '<follow-up-group-check@zammad.example>')
+      end
+
+      let(:receiving_channel)  { create(:channel, group_id: group_b.id) }
+      let!(:receiving_address) { create(:email_address, email: 'groupb@example.com', channel: receiving_channel) }
+
+      let(:ticket_ref) { Setting.get('ticket_hook') + Setting.get('ticket_hook_divider') + ticket.number }
+
+      # Carries both follow-up signals (subject hook and References/In-Reply-To) for a
+      # Group A ticket, but is delivered to Group B's address.
+      let(:raw_mail) { <<~RAW.chomp }
+        From: customer@example.com
+        To: groupb@example.com
+        Subject: Re: #{ticket_ref} please help
+        References: #{article.message_id}
+        In-Reply-To: #{article.message_id}
+
+        Lorem ipsum dolor
+      RAW
+
+      context 'when postmaster_follow_up_new_ticket_for_different_group is enabled' do
+        before { Setting.set('postmaster_follow_up_new_ticket_for_different_group', true) }
+
+        it 'creates a new ticket in the receiving group instead of appending to the foreign ticket' do
+          expect { described_class.new.process({}, raw_mail) }
+            .to change(Ticket, :count).by(1)
+            .and not_change { ticket.articles.reload.length }
+
+          expect(Ticket.last.group).to eq(group_b)
+        end
+      end
+
+      context 'when postmaster_follow_up_new_ticket_for_different_group is disabled (default)' do
+        it 'appends to the existing ticket in the foreign group' do
+          expect { described_class.new.process({}, raw_mail) }
+            .to change { ticket.articles.reload.length }.by(1)
+            .and not_change(Ticket, :count)
+        end
+      end
+    end
+
     describe 'assigning ticket.customer' do
       let(:agent) { create(:agent) }
       let(:customer) { create(:customer) }

@@ -1,0 +1,6 @@
+<li class="overviewSortItem overviewSortItem--overview" data-type="Overview" data-id="<%= @overview.id %>">
+  <div class="overviewSortItem-row">
+    <%- @Icon('draggable', 'overviewSortItem-handle') %>
+    <span class="overviewSortItem-name u-textTruncate"><%- @T(@overview.name) %></span>
+  </div>
+</li>

@@ -1,7 +1,8 @@
 <li class="overview-folder<%= ' is-collapsed' if @collapsed %>" data-folder-id="<%= @id %>">
   <div class="overview-folder-header js-folderToggle" role="button" tabindex="0" aria-expanded="<%= !@collapsed %>">
-    <%- @Icon('arrow-down', 'overview-folder-arrow') %>
+    <svg class="icon overview-folder-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2a1.5 1.5 0 0 1 1.06.44L7.62 4.5H12.5A1.5 1.5 0 0 1 14 6v5.5A1.5 1.5 0 0 1 12.5 13h-9A1.5 1.5 0 0 1 2 11.5z"/></svg>
     <span class="overview-folder-name u-textTruncate"><%- @T(@name) %></span>
+    <%- @Icon('arrow-down', 'overview-folder-arrow') %>
   </div>
   <ul class="nav nav-pills nav-stacked overview-folder-children">
     <%- @childrenHtml %>

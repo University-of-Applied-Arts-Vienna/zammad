@@ -177,24 +177,45 @@ class App.TicketOverviewNavbar extends App.Controller
     root
 
   renderTreeNodes: (node) =>
-    html = ''
-
-    # Folders first, ordered by their admin-defined priority.
-    folderIds = node.folderOrder.sort((a, b) -> node.folders[a].prio - node.folders[b].prio)
-    for id in folderIds
+    # Folders and overviews at the same level are interleaved by a single order,
+    #   so a folder's position can sit between overviews.
+    entries = []
+    for id in node.folderOrder
       folder = node.folders[id]
-      html += App.view('agent_ticket_view/navbar_folder')
-        id:           folder.id
-        name:         folder.name
-        collapsed:    @collapsedFolders[folder.id] is true
-        childrenHtml: @renderTreeNodes(folder)
-
-    # Then the overviews sitting directly at this level.
+      entries.push(kind: 'folder', folder: folder, prio: @folderSortPrio(folder))
     for item in node.overviews
-      html += App.view('agent_ticket_view/navbar_overview')
-        item: item
+      entries.push(kind: 'overview', item: item, prio: @overviewSortPrio(item))
+
+    entries.sort((a, b) -> a.prio - b.prio)
+
+    html = ''
+    for entry in entries
+      if entry.kind is 'folder'
+        folder = entry.folder
+        html += App.view('agent_ticket_view/navbar_folder')
+          id:           folder.id
+          name:         folder.name
+          collapsed:    @collapsedFolders[folder.id] is true
+          childrenHtml: @renderTreeNodes(folder)
+      else
+        html += App.view('agent_ticket_view/navbar_overview')
+          item: entry.item
 
     html
+
+  # Effective sidebar position of an overview: the user's personal order when
+  #   set, otherwise the admin prio (pushed behind personally-sorted entries).
+  overviewSortPrio: (overview) ->
+    for sorting in App.UserOverviewSorting.all()
+      return sorting.prio if sorting.overview_id is overview.id
+    overview.prio + 9999
+
+  # Effective sidebar position of a folder, mirroring overviewSortPrio so that
+  #   folders and overviews interleave by a single order at each level.
+  folderSortPrio: (folder) ->
+    for sorting in App.UserOverviewFolderSorting.all()
+      return sorting.prio if sorting.overview_folder_id is folder.id
+    folder.prio + 9999
 
   toggleFolder: (event) =>
     event.preventDefault()

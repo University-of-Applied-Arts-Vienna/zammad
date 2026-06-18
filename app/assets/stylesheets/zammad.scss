@@ -4362,14 +4362,13 @@ footer {
     background: var(--background-secondary-hover);
   }
 
-  .overview-folder-arrow {
+  .overview-folder-icon {
     flex-shrink: 0;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     fill: currentColor;
-    transition: transform 0.1s ease;
 
-    @include bidi-style(margin-right, 6px, margin-left, 0);
+    @include bidi-style(margin-right, 8px, margin-left, 0);
   }
 
   .overview-folder-name {
@@ -4377,6 +4376,88 @@ footer {
     min-width: 0;
     font-weight: 600;
   }
+
+  .overview-folder-arrow {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+    opacity: 0.6;
+    transition: transform 0.1s ease;
+
+    @include bidi-style(margin-left, 8px, margin-right, 0);
+  }
+}
+
+// Personal "Order of Overviews" profile page: nested, drag-sortable tree.
+.overviewSortTree,
+.overviewSortChildren {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.overviewSortChildren {
+  @include bidi-style(padding-left, 24px, padding-right, 0);
+}
+
+.overviewSortItem {
+  list-style: none;
+}
+
+.overviewSortItem-row {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 8px;
+  margin-bottom: 6px;
+  cursor: move;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 5px;
+
+  &:hover {
+    background: var(--background-secondary-hover);
+  }
+}
+
+.overviewSortItem--folder > .overviewSortItem-row {
+  font-weight: 600;
+}
+
+.overviewSortItem-handle {
+  flex-shrink: 0;
+  width: 12px;
+  height: 16px;
+  fill: currentColor;
+  opacity: 0.4;
+
+  @include bidi-style(margin-right, 8px, margin-left, 0);
+}
+
+.overviewSortItem-folderIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+
+  @include bidi-style(margin-right, 8px, margin-left, 0);
+}
+
+.overviewSortItem-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.overviewSortItem-placeholder {
+  height: 40px;
+  margin-bottom: 6px;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 5px;
+  background: var(--background-secondary-hover);
+}
+
+.overviewSort-actions {
+  margin-top: 16px;
 }
 
 .overview-header {

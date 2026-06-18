@@ -289,6 +289,21 @@ class CreateTicket < ActiveRecord::Migration[4.2]
     add_foreign_key :overview_folders, :users, column: :updated_by_id
     add_foreign_key :overviews, :overview_folders, column: :folder_id
 
+    create_table :user_overview_folder_sortings do |t|
+      t.column :user_id,            :integer, null: false
+      t.column :overview_folder_id, :integer, null: false
+      t.column :prio,               :integer, null: false
+      t.column :updated_by_id,      :integer, null: false
+      t.column :created_by_id,      :integer, null: false
+      t.timestamps limit: 3, null: false
+    end
+    add_index :user_overview_folder_sortings, [:user_id]
+    add_index :user_overview_folder_sortings, [:overview_folder_id]
+    add_foreign_key :user_overview_folder_sortings, :users, column: :created_by_id
+    add_foreign_key :user_overview_folder_sortings, :users, column: :updated_by_id
+    add_foreign_key :user_overview_folder_sortings, :users, column: :user_id
+    add_foreign_key :user_overview_folder_sortings, :overview_folders, column: :overview_folder_id
+
     create_table :overviews_roles, id: false do |t|
       t.references :overview
       t.references :role

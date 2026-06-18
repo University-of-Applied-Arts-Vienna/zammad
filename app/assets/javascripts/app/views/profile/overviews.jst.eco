@@ -1,0 +1,18 @@
+<div class="page-header">
+  <div class="page-header-title">
+    <h1><%- @T('Order of Overviews') %></h1>
+  </div>
+</div>
+<div class="page-content">
+  <p><%- @T('Drag overviews and folders to change the order they appear in the overviews sidebar. Items can be reordered within their level.') %></p>
+  <% if @hasItems: %>
+    <ul class="js-sortable js-overviewSortRoot overviewSortTree">
+      <%- @treeHtml %>
+    </ul>
+    <div class="overviewSort-actions">
+      <button class="btn btn--danger js-reset"><%- @T('Reset overview order') %></button>
+    </div>
+  <% else: %>
+    <p class="text-muted"><%- @T('Currently no overview is assigned to your roles. Please contact your administrator.') %></p>
+  <% end %>
+</div>

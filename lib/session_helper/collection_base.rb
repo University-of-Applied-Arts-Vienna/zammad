@@ -7,8 +7,9 @@ module SessionHelper::CollectionBase
   def session(collections, assets, user)
 
     # all base stuff
-    collections[ Locale.to_app_model ]                = Locale.where(active: true)
-    collections[ User::OverviewSorting.to_app_model ] = User::OverviewSorting.where(user: user)
+    collections[ Locale.to_app_model ]                      = Locale.where(active: true)
+    collections[ User::OverviewSorting.to_app_model ]       = User::OverviewSorting.where(user: user)
+    collections[ User::OverviewFolderSorting.to_app_model ] = User::OverviewFolderSorting.where(user: user)
 
     collections[ Taskbar.to_app_model ] = Taskbar.where(user_id: user.id, app: :desktop)
     collections[ Taskbar.to_app_model ].each do |item|

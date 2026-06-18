@@ -5,8 +5,10 @@ class User::OverviewSortingsController < ApplicationController
 
   def index
     render json: {
-      overviews:         Ticket::Overviews.all(current_user: current_user, ignore_user_conditions: true),
-      overview_sortings: User::OverviewSorting.where(user: current_user),
+      overviews:                Ticket::Overviews.all(current_user: current_user, ignore_user_conditions: true),
+      overview_sortings:        User::OverviewSorting.where(user: current_user),
+      folders:                  visible_folders,
+      overview_folder_sortings: User::OverviewFolderSorting.where(user: current_user),
     }
   end
 
@@ -32,20 +34,46 @@ class User::OverviewSortingsController < ApplicationController
   end
 
   def prio
-    overview_ids = params[:prios].map(&:first)
-
-    authorized_overviews = Ticket::Overviews
-      .all(current_user:, ignore_user_conditions: true)
-      .where(id: overview_ids)
-      .sort_by { |elem| overview_ids.index(elem.id) }
-
-    Service::User::Overview::UpdateOrder
+    Service::User::Overview::UpdateTreeOrder
       .with_current_user(current_user)
-      .execute(authorized_overviews)
+      .execute(authorized_entries)
 
     Gql::Subscriptions::User::Current::OverviewOrderingUpdates
       .trigger_by(current_user)
 
     render json: { success: true }, status: :ok
+  end
+
+  private
+
+  def visible_folders
+    Service::User::Overview::Folder::List
+      .with_current_user(current_user)
+      .execute(ignore_user_conditions: true)
+  end
+
+  # Keep only the entries the user is actually allowed to order, preserving the
+  #   given (depth-first) order.
+  def authorized_entries
+    authorized_overview_ids = Ticket::Overviews
+      .all(current_user:, ignore_user_conditions: true)
+      .pluck(:id).to_set
+
+    authorized_folder_ids = visible_folders.pluck(:id).to_set
+
+    Array(params[:entries]).filter_map do |entry|
+      id = entry[:id].to_i
+
+      case entry[:type]
+      when 'Overview'
+        next if authorized_overview_ids.exclude?(id)
+      when 'OverviewFolder'
+        next if authorized_folder_ids.exclude?(id)
+      else
+        next
+      end
+
+      { type: entry[:type], id: }
+    end
   end
 end

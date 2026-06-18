@@ -15,6 +15,7 @@ class OverviewFolder < ApplicationModel
   belongs_to :parent, class_name: 'OverviewFolder', optional: true, inverse_of: :children
   has_many   :children, class_name: 'OverviewFolder', foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
   has_many   :overviews, inverse_of: :folder, dependent: :nullify
+  has_many   :overview_folder_sortings, class_name: 'User::OverviewFolderSorting', dependent: :destroy
 
   validates :name, presence: true
   validate  :validate_parent

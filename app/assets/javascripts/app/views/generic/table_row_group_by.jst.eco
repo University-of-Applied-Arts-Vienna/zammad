@@ -1,3 +1,12 @@
-<tr>
-  <td colspan="<%= @columnsLength %>"><b><%- @groupByName %><% if @groupByCount:%> (<%= @groupByCount %>)<% end %></b></td>
+<tr<% if @groupByValue: %> data-group-by-value="<%= @groupByValue %>"<% end %>>
+  <td colspan="<%= @columnsLength %>">
+    <b><%- @groupByName %><% if @groupByCount:%> (<%= @groupByCount %>)<% end %></b>
+    <% if @groupByActions: %>
+      <span class="table-group-by-actions">
+        <% for action in @groupByActions: %>
+          <span class="btn btn--text btn--secondary <%= action.class %>" data-group-action="<%= action.name %>" title="<%- @Ti(action.title) %>"><%- @Icon(action.icon) %></span>
+        <% end %>
+      </span>
+    <% end %>
+  </td>
 </tr>

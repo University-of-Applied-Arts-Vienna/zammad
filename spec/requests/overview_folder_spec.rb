@@ -67,6 +67,25 @@ RSpec.describe 'Overview Folders', type: :request do
         expect(response).to have_http_status(:ok)
         expect(OverviewFolder).not_to exist(folder.id)
       end
+
+      it 'searches folders (used by the admin overview list)' do
+        folder = create(:overview_folder, name: 'Searchable folder')
+
+        post '/api/v1/overview_folders/search', params: { query: '', full: true }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['record_ids']).to include(folder.id)
+      end
+
+      it 'filters folders by query' do
+        match = create(:overview_folder, name: 'Sales')
+        create(:overview_folder, name: 'Support')
+
+        post '/api/v1/overview_folders/search', params: { query: 'Sales', full: true }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['record_ids']).to eq([match.id])
+      end
     end
   end
 

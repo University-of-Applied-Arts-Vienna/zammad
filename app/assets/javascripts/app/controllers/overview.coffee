@@ -1,6 +1,12 @@
+# Copyright (C) 2012-2026 Zammad Foundation, https://zammad-foundation.org/
+
 class Overview extends App.ControllerSubContent
   @requiredPermission: 'admin.overview'
   header: __('Overviews')
+
+  events:
+    'click [data-type=new-folder]': 'newFolder'
+
   constructor: ->
     super
 
@@ -15,6 +21,22 @@ class Overview extends App.ControllerSubContent
       genericObject: 'Overview'
       defaultSortBy: 'prio'
       groupBy: 'folder'
+      groupByActions: [
+        {
+          name:     'edit-folder'
+          title:    __('Edit folder')
+          icon:     'pen'
+          class:    'js-edit-folder'
+          callback: @editFolder
+        }
+        {
+          name:     'delete-folder'
+          title:    __('Delete folder')
+          icon:     'trash'
+          class:    'js-delete-folder'
+          callback: @deleteFolder
+        }
+      ]
       searchBar: true
       searchQuery: @search_query
       pageData:
@@ -28,6 +50,7 @@ class Overview extends App.ControllerSubContent
         pagerPerPage: 50
         navupdate: '#overviews'
         buttons: [
+          { name: __('New Folder'), 'data-type': 'new-folder', class: 'btn--secondary' }
           { name: __('New Overview'), 'data-type': 'new', class: 'btn--success' }
         ]
       container: @el.closest('.content')
@@ -63,5 +86,42 @@ class Overview extends App.ControllerSubContent
         @[key] = value
 
     @genericController.paginate(@page || 1, params)
+
+  newFolder: (e) =>
+    e?.preventDefault()
+    new App.ControllerGenericNew(
+      genericObject: 'OverviewFolder'
+      pageData:
+        object: __('Folder')
+      container: @el.closest('.content')
+      callback:  @reloadFolders
+    )
+
+  editFolder: (id, e) =>
+    e?.preventDefault()
+    new App.ControllerGenericEdit(
+      id:            id
+      genericObject: 'OverviewFolder'
+      pageData:
+        object: __('Folder')
+      container: @el.closest('.content')
+      callback:  @reloadFolders
+    )
+
+  deleteFolder: (id, e) =>
+    e?.preventDefault()
+    new App.ControllerGenericDestroyConfirm(
+      item:      App.OverviewFolder.find(id)
+      container: @el.closest('.content')
+      callback:  @reloadFolders
+    )
+
+  # Refresh the cached folders and re-render the overview list after a folder
+  #   was created, changed or deleted.
+  reloadFolders: =>
+    App.OverviewFolder.fetchFull(
+      => @genericController.render()
+      clear: true
+    )
 
 App.Config.set('Overview', { prio: 2300, name: __('Overviews'), parent: '#manage', target: '#manage/overviews', controller: Overview, permission: ['admin.overview'] }, 'NavBarAdmin')

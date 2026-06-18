@@ -1664,6 +1664,21 @@ td.align-right {
   border-color: transparent;
 }
 
+.table-group-by-actions {
+  float: right;
+  display: inline-flex;
+  gap: 4px;
+  visibility: hidden;
+
+  .btn {
+    padding: 0;
+  }
+}
+
+.table > tbody > tr[data-group-by-value]:hover .table-group-by-actions {
+  visibility: visible;
+}
+
 .table > tbody > tr.u-center > td {
   vertical-align: middle;
 }

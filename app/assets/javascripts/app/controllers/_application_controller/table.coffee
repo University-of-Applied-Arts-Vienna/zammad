@@ -109,6 +109,7 @@ class App.ControllerTable extends App.Controller
   radio:              false
   renderState:        undefined
   groupBy:            undefined
+  groupByActions:     undefined
   groupDirection:     undefined
 
   pagerEnabled: true
@@ -439,6 +440,18 @@ class App.ControllerTable extends App.Controller
                 callback(id, e)
             )
 
+    # bind group-by actions (e.g. edit/delete a folder from its group header)
+    if !_.isEmpty(@groupByActions)
+      table.on('click', '[data-group-action]', (e) =>
+        e.preventDefault()
+        e.stopPropagation()
+        $target = $(e.currentTarget)
+        name    = $target.attr('data-group-action')
+        value   = $target.closest('tr').attr('data-group-by-value')
+        action  = _.findWhere(@groupByActions, name: name)
+        action.callback(value, e) if action
+      )
+
     # bind bindCheckbox
     if @bindCheckbox
       if @bindCheckbox.events
@@ -592,11 +605,24 @@ class App.ControllerTable extends App.Controller
           if @groupObjectName(localObject, groupBy) is groupLast
             groupByCount += 1
 
+    # Resolve the record id behind the group (e.g. the folder id), so that
+    #   optional group actions can act on it. Groups without an underlying
+    #   record (e.g. the "no folder" group) don't get any actions.
+    groupByActions = undefined
+    groupByValue   = undefined
+    if !_.isEmpty(@groupByActions)
+      groupKey = @groupBy
+      groupKey += '_id' if groupKey not of object
+      groupByValue = object[groupKey]
+      groupByActions = @groupByActions if groupByValue
+
     App.view('generic/table_row_group_by')(
-      position:      position
-      groupByName:   groupByName
-      groupByCount:  groupByCount
-      columnsLength: @columnsLength
+      position:       position
+      groupByName:    groupByName
+      groupByCount:   groupByCount
+      columnsLength:  @columnsLength
+      groupByActions: groupByActions
+      groupByValue:   groupByValue
     )
 
   renderTableRow: (object, position, actions) =>

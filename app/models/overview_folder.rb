@@ -6,6 +6,8 @@ class OverviewFolder < ApplicationModel
   include ChecksClientNotification
   include CanSeed
   include CanPriorization
+  include CanSelector
+  include CanSearch
 
   include OverviewFolder::Assets
   include OverviewFolder::TriggersSubscriptions

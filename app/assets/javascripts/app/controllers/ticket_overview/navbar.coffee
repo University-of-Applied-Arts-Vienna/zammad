@@ -12,8 +12,12 @@ class App.TicketOverviewNavbar extends App.Controller
   events:
     'click .js-tab': 'activate'
     'click .js-dropdownItem': 'navigateTo'
+    'click .js-folderToggle': 'toggleFolder'
+    'keydown .js-folderToggle': 'onFolderKeydown'
     'hide.bs.dropdown': 'onDropdownHide'
     'show.bs.dropdown': 'onDropdownShow'
+
+  collapsedFoldersStorageKey: 'ticket_overview_folders_collapsed'
 
   constructor: ->
     super
@@ -133,8 +137,95 @@ class App.TicketOverviewNavbar extends App.Controller
     else
       data.sort((a, b) -> a.prio - b.prio)
 
-    @html App.view("agent_ticket_view/navbar#{ if @vertical then '_vertical' else '' }")
-      items: data
-
     if @vertical
+      @html App.view('agent_ticket_view/navbar_vertical')
+        items: data
       @autoFoldTabs()
+    else
+      @renderSidebar(data)
+
+  # Renders the vertical sidebar list, grouping overviews into their (collapsible)
+  #   folders. Overviews and folders without a (visible) folder stay at root level.
+  renderSidebar: (data) =>
+    @collapsedFolders = @loadCollapsedFolders()
+
+    # Never keep a folder collapsed if it contains the currently active overview,
+    #   so the selected overview is always visible after a (re)render.
+    for item in data when item.active && item.folder_path
+      for folder in item.folder_path
+        delete @collapsedFolders[folder.id]
+
+    tree = @buildOverviewTree(data)
+
+    @html App.view('agent_ticket_view/navbar')
+      nodesHtml: @renderTreeNodes(tree)
+
+  # Builds a nested folder/overview tree from the flat overview index. Each
+  #   overview carries its full folder breadcrumb (root -> leaf) in `folder_path`.
+  buildOverviewTree: (items) ->
+    root = { folders: {}, folderOrder: [], overviews: [] }
+
+    for item in items
+      node = root
+      for folder in (item.folder_path or [])
+        if !node.folders[folder.id]
+          node.folders[folder.id] = { id: folder.id, name: folder.name, prio: folder.prio, folders: {}, folderOrder: [], overviews: [] }
+          node.folderOrder.push(folder.id)
+        node = node.folders[folder.id]
+      node.overviews.push(item)
+
+    root
+
+  renderTreeNodes: (node) =>
+    html = ''
+
+    # Folders first, ordered by their admin-defined priority.
+    folderIds = node.folderOrder.sort((a, b) -> node.folders[a].prio - node.folders[b].prio)
+    for id in folderIds
+      folder = node.folders[id]
+      html += App.view('agent_ticket_view/navbar_folder')
+        id:           folder.id
+        name:         folder.name
+        collapsed:    @collapsedFolders[folder.id] is true
+        childrenHtml: @renderTreeNodes(folder)
+
+    # Then the overviews sitting directly at this level.
+    for item in node.overviews
+      html += App.view('agent_ticket_view/navbar_overview')
+        item: item
+
+    html
+
+  toggleFolder: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
+
+    folderEl = $(event.currentTarget).closest('.overview-folder')
+    folderId = parseInt(folderEl.attr('data-folder-id'), 10)
+    return if !folderId
+
+    collapsed = folderEl.toggleClass('is-collapsed').hasClass('is-collapsed')
+    folderEl.children('.overview-folder-header').attr('aria-expanded', !collapsed)
+
+    @collapsedFolders ?= {}
+    if collapsed
+      @collapsedFolders[folderId] = true
+    else
+      delete @collapsedFolders[folderId]
+    @saveCollapsedFolders()
+
+  onFolderKeydown: (event) =>
+    # toggle on Enter or Space
+    return if event.keyCode isnt 13 && event.keyCode isnt 32
+    @toggleFolder(event)
+
+  loadCollapsedFolders: =>
+    ids = App.LocalStorage.get(@collapsedFoldersStorageKey, App.User.current().id) or []
+    map = {}
+    for id in ids
+      map[id] = true
+    map
+
+  saveCollapsedFolders: =>
+    ids = (parseInt(id, 10) for id, collapsed of @collapsedFolders when collapsed)
+    App.LocalStorage.set(@collapsedFoldersStorageKey, ids, App.User.current().id)

@@ -50,6 +50,36 @@ RSpec.describe OverviewFolder, type: :model do
     end
   end
 
+  describe '.breadcrumb' do
+    let(:lookup) { OverviewFolder.active_lookup }
+
+    it 'returns the active folder chain from root to leaf' do
+      root   = create(:overview_folder)
+      middle = create(:overview_folder, parent: root)
+      leaf   = create(:overview_folder, parent: middle)
+
+      expect(described_class.breadcrumb(leaf.id, lookup)).to eq([root, middle, leaf])
+    end
+
+    it 'returns an empty array for a missing folder id' do
+      expect(described_class.breadcrumb(nil, lookup)).to eq([])
+    end
+
+    it 'returns an empty array when the folder itself is inactive' do
+      inactive = create(:overview_folder, active: false)
+
+      expect(described_class.breadcrumb(inactive.id, lookup)).to eq([])
+    end
+
+    it 'stops at an inactive ancestor, re-rooting the chain below it' do
+      root   = create(:overview_folder)
+      middle = create(:overview_folder, parent: root, active: false)
+      leaf   = create(:overview_folder, parent: middle)
+
+      expect(described_class.breadcrumb(leaf.id, OverviewFolder.active_lookup)).to eq([leaf])
+    end
+  end
+
   describe 'prioritization' do
     it 'auto-assigns an increasing prio' do
       first  = create(:overview_folder, prio: nil)

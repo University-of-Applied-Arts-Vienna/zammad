@@ -1,0 +1,6 @@
+<li class="js-overview<%= ' active' if @item.active %>">
+  <a class="horizontal center" href="<%= @item.target %>">
+    <span class="local u-textTruncate"><%- @T(@item.name) %></span>
+    <span class="badge badge--text"><%= @item.count %></span>
+  </a>
+</li>

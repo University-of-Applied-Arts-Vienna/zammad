@@ -21,15 +21,18 @@ class TicketOverviewsController < ApplicationController
     # get navbar overview data
     if !params[:view]
       index_and_lists = Ticket::Overviews.index(current_user)
+      folder_lookup   = OverviewFolder.active_lookup
       indexes = []
       index_and_lists.each do |index|
         overview = Overview.lookup(id: index[:overview][:id])
         meta = {
-          id:    overview.id,
-          name:  overview.name,
-          prio:  overview.prio,
-          link:  overview.link,
-          count: index[:count],
+          id:          overview.id,
+          name:        overview.name,
+          prio:        overview.prio,
+          link:        overview.link,
+          count:       index[:count],
+          folder_id:   overview.folder_id,
+          folder_path: OverviewFolder.breadcrumb(overview.folder_id, folder_lookup).map { |folder| { id: folder.id, name: folder.name, prio: folder.prio } },
         }
         indexes.push meta
       end

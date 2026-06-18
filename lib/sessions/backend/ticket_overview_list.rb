@@ -113,16 +113,19 @@ class Sessions::Backend::TicketOverviewList < Sessions::Backend::Base
 
     # push overview index
     indexes = []
+    folder_lookup = OverviewFolder.active_lookup
     index_and_lists.each do |index|
       overview = Overview.lookup(id: index[:overview][:id])
       next if !overview
 
       meta = {
-        id:    overview.id,
-        name:  overview.name,
-        prio:  overview.prio,
-        link:  overview.link,
-        count: index[:count],
+        id:          overview.id,
+        name:        overview.name,
+        prio:        overview.prio,
+        link:        overview.link,
+        count:       index[:count],
+        folder_id:   overview.folder_id,
+        folder_path: OverviewFolder.breadcrumb(overview.folder_id, folder_lookup).map { |folder| { id: folder.id, name: folder.name, prio: folder.prio } },
       }
       indexes.push meta
     end

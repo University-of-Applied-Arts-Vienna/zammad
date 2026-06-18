@@ -1,0 +1,9 @@
+<li class="overview-folder<%= ' is-collapsed' if @collapsed %>" data-folder-id="<%= @id %>">
+  <div class="overview-folder-header js-folderToggle" role="button" tabindex="0" aria-expanded="<%= !@collapsed %>">
+    <%- @Icon('arrow-down', 'overview-folder-arrow') %>
+    <span class="overview-folder-name u-textTruncate"><%- @T(@name) %></span>
+  </div>
+  <ul class="nav nav-pills nav-stacked overview-folder-children">
+    <%- @childrenHtml %>
+  </ul>
+</li>

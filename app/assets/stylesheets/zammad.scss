@@ -4330,6 +4330,55 @@ footer {
   }
 }
 
+// Collapsible folder groups in the agent overview sidebar.
+.overview-folder {
+  .overview-folder-children {
+    margin: 0;
+
+    @include bidi-style(padding-left, 14px, padding-right, 0);
+  }
+
+  &.is-collapsed > .overview-folder-children {
+    display: none;
+  }
+
+  &.is-collapsed > .overview-folder-header .overview-folder-arrow {
+    transform: rotate(-90deg);
+
+    @include rtl(transform, rotate(90deg));
+  }
+}
+
+.overview-folder-header {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  cursor: pointer;
+  color: var(--text-nav);
+  border-top: 1px solid var(--background-modifier-border);
+  user-select: none;
+
+  &:hover {
+    background: var(--background-secondary-hover);
+  }
+
+  .overview-folder-arrow {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+    transition: transform 0.1s ease;
+
+    @include bidi-style(margin-right, 6px, margin-left, 0);
+  }
+
+  .overview-folder-name {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+  }
+}
+
 .overview-header {
   position: relative;
   margin: 20px 0 32px;

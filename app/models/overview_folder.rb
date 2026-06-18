@@ -37,6 +37,29 @@ class OverviewFolder < ApplicationModel
     children.flat_map { |child| [child, *child.descendants] }
   end
 
+  # Lookup of all active folders indexed by id, used to resolve breadcrumbs
+  #   without running a query per ancestor.
+  def self.active_lookup
+    where(active: true).index_by(&:id)
+  end
+
+  # Active-folder breadcrumb (root -> leaf) for the given folder id, resolved via
+  #   a preloaded active-folder lookup (see .active_lookup). The walk up the
+  #   ancestor chain stops at the first inactive/missing folder, mirroring the
+  #   visibility rules of Service::User::Overview::Folder::List. Returns an empty
+  #   array when the folder itself is inactive or missing.
+  def self.breadcrumb(folder_id, active_lookup)
+    chain = []
+    current_id = folder_id
+
+    while current_id && (folder = active_lookup[current_id]) && chain.none? { |existing| existing.id == folder.id }
+      chain.unshift(folder)
+      current_id = folder.parent_id
+    end
+
+    chain
+  end
+
   private
 
   def validate_parent

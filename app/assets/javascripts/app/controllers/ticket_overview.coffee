@@ -206,29 +206,27 @@ class App.TicketOverview extends App.Controller
         @scrollToIfNeeded(prev, true)
 
     else
-      # get current
+      # get current (overviews can be nested in collapsible folders, so navigate
+      #   over the flat list of currently visible overview entries)
       items = @$('.sidebar')
-      current = items.find('li.active')
+      overviews = items.find('li.js-overview:visible')
+
+      return if !overviews.length
+
+      current = overviews.filter('.active')
 
       if !current.length
-        location = items.find('li a').first().attr('href')
+        location = overviews.first().find('a').attr('href')
         if location
           @navigate location
         return
 
-      if position is 1
-        next = current.next('li')
-        if next.length
-          @navigate next.find('a').attr('href')
-      else
-        prev = current.prev('li')
-        if prev.length
-          @navigate prev.find('a').attr('href')
+      targetIndex = overviews.index(current) + position
+      return if targetIndex < 0 || targetIndex >= overviews.length
 
-      if next
-        @scrollToIfNeeded(next, true)
-      if prev
-        @scrollToIfNeeded(prev, true)
+      target = overviews.eq(targetIndex)
+      @navigate target.find('a').attr('href')
+      @scrollToIfNeeded(target, true)
 
 class TicketOverviewRouter extends App.ControllerPermanent
   @requiredPermission: ['ticket.agent', 'ticket.customer']

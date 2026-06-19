@@ -128,6 +128,9 @@ class Overviews extends App.ControllerSubContent
   saveOrder: =>
     entries = @collectEntries(@$('.js-overviewSortRoot').first())
 
+    # never POST an empty order from a drag — that would clear the personal order
+    return if !entries.length
+
     @ajax(
       id:          'user_overview_sortings_prio'
       type:        'POST'
@@ -145,7 +148,7 @@ class Overviews extends App.ControllerSubContent
       type:        'POST'
       url:         "#{@apiPath}/user_overview_sortings_prio"
       processData: true
-      data:        JSON.stringify(entries: [])
+      data:        JSON.stringify(reset: true)
       success:     =>
         @notify
           type: 'success'

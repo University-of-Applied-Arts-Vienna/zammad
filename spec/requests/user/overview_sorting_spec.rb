@@ -53,6 +53,28 @@ RSpec.describe 'User Overview sorting', authenticated_as: :user, type: :request 
       expect(Gql::Subscriptions::User::Current::OverviewOrderingUpdates)
         .to have_received(:trigger_by).with(user)
     end
+
+    it 'clears the personal order on an explicit reset' do
+      create(:user_overview_sorting, overview:, user:)
+
+      post '/api/v1/user_overview_sortings_prio', params: { reset: true }
+
+      expect(User::OverviewSorting.where(user:)).to be_empty
+    end
+
+    it 'keeps the existing order when the payload is empty' do
+      sorting = create(:user_overview_sorting, overview:, user:)
+
+      post '/api/v1/user_overview_sortings_prio', params: { entries: [] }
+
+      expect(User::OverviewSorting.where(user:)).to contain_exactly(sorting)
+    end
+
+    it 'accepts the legacy overview-only payload' do
+      post '/api/v1/user_overview_sortings_prio', params: { prios: [[overview.id, 1]] }
+
+      expect(User::OverviewSorting.find_by(user:, overview:)).to be_present
+    end
   end
 
   describe 'DELETE /user_overview_sortings/:id' do

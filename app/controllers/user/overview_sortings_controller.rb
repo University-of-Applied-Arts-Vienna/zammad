@@ -34,17 +34,33 @@ class User::OverviewSortingsController < ApplicationController
   end
 
   def prio
-    Service::User::Overview::UpdateTreeOrder
-      .with_current_user(current_user)
-      .execute(authorized_entries)
+    if reset_requested?
+      update_order([])
+    else
+      entries = authorized_entries
 
-    Gql::Subscriptions::User::Current::OverviewOrderingUpdates
-      .trigger_by(current_user)
+      # Never wipe the personal order on an empty/unrecognized payload; only an
+      #   explicit reset clears it.
+      update_order(entries) if entries.present?
+    end
 
     render json: { success: true }, status: :ok
   end
 
   private
+
+  def reset_requested?
+    ActiveModel::Type::Boolean.new.cast(params[:reset])
+  end
+
+  def update_order(entries)
+    Service::User::Overview::UpdateTreeOrder
+      .with_current_user(current_user)
+      .execute(entries)
+
+    Gql::Subscriptions::User::Current::OverviewOrderingUpdates
+      .trigger_by(current_user)
+  end
 
   def visible_folders
     Service::User::Overview::Folder::List
@@ -61,19 +77,29 @@ class User::OverviewSortingsController < ApplicationController
 
     authorized_folder_ids = visible_folders.pluck(:id).to_set
 
-    Array(params[:entries]).filter_map do |entry|
-      id = entry[:id].to_i
-
+    requested_entries.filter_map do |entry|
       case entry[:type]
       when 'Overview'
-        next if authorized_overview_ids.exclude?(id)
+        next if authorized_overview_ids.exclude?(entry[:id])
       when 'OverviewFolder'
-        next if authorized_folder_ids.exclude?(id)
+        next if authorized_folder_ids.exclude?(entry[:id])
       else
         next
       end
 
-      { type: entry[:type], id: }
+      entry
+    end
+  end
+
+  # Normalizes the request body into typed `{ type:, id: }` entries in display
+  #   order. Accepts the tree payload (`entries`) and the legacy overview-only
+  #   payload (`prios`, e.g. from a cached older asset) so an outdated client
+  #   keeps ordering overviews instead of silently losing its order.
+  def requested_entries
+    if params[:entries].present?
+      Array(params[:entries]).map { |entry| { type: entry[:type], id: entry[:id].to_i } }
+    else
+      Array(params[:prios]).map { |pair| { type: 'Overview', id: Array(pair).first.to_i } }
     end
   end
 end

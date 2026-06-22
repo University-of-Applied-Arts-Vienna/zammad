@@ -1,0 +1,52 @@
+<p class="overview-bulk-intro"><%- @T('Editing %s overviews at once. Only the settings you enable below will be changed; all other settings of each overview stay untouched.', @count) %></p>
+
+<fieldset class="overview-bulk-section" data-section="roles">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_roles" data-section="roles">
+    <span class="overview-bulk-section-title"><%- @T('Available for the following roles') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+    <p class="help-text js-roles-current"></p>
+  </div>
+</fieldset>
+
+<fieldset class="overview-bulk-section" data-section="attributes">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_attributes" data-section="attributes">
+    <span class="overview-bulk-section-title"><%- @T('Attributes') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+  </div>
+</fieldset>
+
+<fieldset class="overview-bulk-section" data-section="sorting">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_sorting" data-section="sorting">
+    <span class="overview-bulk-section-title"><%- @T('Sorting') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+  </div>
+</fieldset>
+
+<fieldset class="overview-bulk-section" data-section="grouping">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_grouping" data-section="grouping">
+    <span class="overview-bulk-section-title"><%- @T('Grouping') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+  </div>
+</fieldset>
+
+<fieldset class="overview-bulk-section" data-section="active">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_active" data-section="active">
+    <span class="overview-bulk-section-title"><%- @T('Active') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+  </div>
+</fieldset>

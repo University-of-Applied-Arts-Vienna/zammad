@@ -5,7 +5,10 @@ class Overview extends App.ControllerSubContent
   header: __('Overviews')
 
   events:
-    'click [data-type=new-folder]': 'newFolder'
+    'click [data-type=new-folder]':  'newFolder'
+    'click [data-type=bulk-edit]':   'bulkEdit'
+
+  bulkEditLabel: __('Edit selected')
 
   constructor: ->
     super
@@ -50,9 +53,16 @@ class Overview extends App.ControllerSubContent
         pagerPerPage: 50
         navupdate: '#overviews'
         buttons: [
+          { name: @bulkEditLabel, 'data-type': 'bulk-edit', class: 'btn--primary js-bulkEdit is-disabled' }
           { name: __('New Folder'), 'data-type': 'new-folder', class: 'btn--secondary' }
           { name: __('New Overview'), 'data-type': 'new', class: 'btn--success' }
         ]
+        tableExtend:
+          checkbox: true
+          bindCheckbox:
+            events:
+              change: => @updateBulkEditButton()
+            select_all: => @updateBulkEditButton()
       container: @el.closest('.content')
       veryLarge: true
       dndCallback: (e, item) =>
@@ -86,6 +96,45 @@ class Overview extends App.ControllerSubContent
         @[key] = value
 
     @genericController.paginate(@page || 1, params)
+
+  selectedIds: =>
+    ids = []
+    @$('[name="bulk"]:checked').each((_index, element) ->
+      ids.push parseInt($(element).val(), 10)
+    )
+    ids
+
+  # Reflect the current selection on the bulk-edit button (count + enabled
+  #   state). The button is rendered by the generic index, so it is updated in
+  #   place rather than re-rendered.
+  updateBulkEditButton: =>
+    button = @$('[data-type=bulk-edit]')
+    return if !button.length
+
+    count = @selectedIds().length
+    label = App.i18n.translateContent(@bulkEditLabel)
+    label = "#{label} (#{count})" if count > 0
+    button.text(label)
+    button.toggleClass('is-disabled', count is 0)
+
+  bulkEdit: (e) =>
+    e.preventDefault()
+
+    ids = @selectedIds()
+    if _.isEmpty(ids)
+      @notify(
+        type: 'error'
+        msg:  __('Please select at least one overview.')
+      )
+      return
+
+    new App.OverviewBulkEdit(
+      overviewIds: ids
+      container:   @el.closest('.content')
+      callback:    =>
+        @$('[name="bulk"]:checked, [name="bulk_all"]:checked').prop('checked', false)
+        @updateBulkEditButton()
+    )
 
   newFolder: (e) =>
     e?.preventDefault()

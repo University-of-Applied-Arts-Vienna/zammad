@@ -4637,6 +4637,38 @@ footer {
   }
 }
 
+.overview-bulk-intro {
+  margin-bottom: 16px;
+}
+
+.overview-bulk-section {
+  border-top: 1px solid hsl(0, 0%, 90%);
+  padding: 12px 0;
+  margin: 0;
+}
+
+.overview-bulk-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0;
+}
+
+.overview-bulk-section-title {
+  user-select: none;
+}
+
+.overview-bulk-section-body {
+  display: none;
+  margin-top: 12px;
+}
+
+.overview-bulk-section.is-active .overview-bulk-section-body {
+  display: block;
+}
+
 .panel {
   box-shadow: none;
   background: var(--background-secondary);

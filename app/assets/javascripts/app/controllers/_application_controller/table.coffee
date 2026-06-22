@@ -474,8 +474,10 @@ class App.ControllerTable extends App.Controller
     # enable checkbox bulk selection
     if @checkbox
 
-      # click first tr>td, catch click
-      table.on('click', 'tr > td:nth-child(1)', (e) ->
+      # catch clicks on the checkbox cell so they don't bubble to the row
+      #   (e.g. trigger an edit). Target the cell by class because a leading
+      #   drag handle column would otherwise shift it out of the first position.
+      table.on('click', 'tr > td.table-checkbox', (e) ->
         e.stopPropagation()
       )
 

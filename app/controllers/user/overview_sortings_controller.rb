@@ -71,11 +71,15 @@ class User::OverviewSortingsController < ApplicationController
   # Keep only the entries the user is actually allowed to order, preserving the
   #   given (depth-first) order.
   def authorized_entries
+    # `.reorder(nil)` drops the default prio/name ordering: it is irrelevant for
+    #   the id set and otherwise breaks `SELECT DISTINCT ... pluck(:id)` on
+    #   PostgreSQL (ORDER BY columns must be in the DISTINCT select list).
     authorized_overview_ids = Ticket::Overviews
       .all(current_user:, ignore_user_conditions: true)
+      .reorder(nil)
       .pluck(:id).to_set
 
-    authorized_folder_ids = visible_folders.pluck(:id).to_set
+    authorized_folder_ids = visible_folders.reorder(nil).pluck(:id).to_set
 
     requested_entries.filter_map do |entry|
       case entry[:type]

@@ -1040,8 +1040,8 @@ class CreateBase < ActiveRecord::Migration[4.2]
     end
 
     create_table :admin_messages_groups, id: false do |t|
-      t.references :admin_message, foreign_key: { to_table: :admin_messages }
-      t.references :group
+      t.references :admin_message, foreign_key: { to_table: :admin_messages }, index: false
+      t.references :group, index: false
     end
     add_index :admin_messages_groups, [:admin_message_id]
     add_index :admin_messages_groups, [:group_id]

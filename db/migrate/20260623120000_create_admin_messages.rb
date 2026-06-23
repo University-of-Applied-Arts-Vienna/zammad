@@ -35,8 +35,8 @@ class CreateAdminMessages < ActiveRecord::Migration[8.0]
 
   def create_admin_messages_groups_table
     create_table :admin_messages_groups, id: false do |t|
-      t.references :admin_message, type: :integer, foreign_key: { to_table: :admin_messages }
-      t.references :group, type: :integer
+      t.references :admin_message, type: :integer, foreign_key: { to_table: :admin_messages }, index: false
+      t.references :group, type: :integer, index: false
     end
     add_index :admin_messages_groups, [:admin_message_id]
     add_index :admin_messages_groups, [:group_id]

@@ -63,6 +63,10 @@ export const OnlineNotificationsDocument = gql`
                 errorMessage
                 ticketTitle
               }
+              ... on OnlineNotificationStandaloneAdminMessageData {
+                message
+                adminMessageId
+              }
             }
           }
           ... on KnowledgeBaseAnswerTranslation {

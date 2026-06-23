@@ -55,6 +55,10 @@ query onlineNotifications {
                 errorMessage
                 ticketTitle
               }
+              ... on OnlineNotificationStandaloneAdminMessageData {
+                message
+                adminMessageId
+              }
             }
           }
           ... on KnowledgeBaseAnswerTranslation {

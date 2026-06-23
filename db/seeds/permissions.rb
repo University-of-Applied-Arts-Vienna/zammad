@@ -316,6 +316,12 @@ Permission.create_if_not_exists(
   preferences: { prio: 1420 }
 )
 Permission.create_if_not_exists(
+  name:        'admin.message',
+  label:       __('Admin Messages'),
+  description: __('Manage admin messages of your system.'),
+  preferences: { prio: 1425 }
+)
+Permission.create_if_not_exists(
   name:        'admin.monitoring',
   label:       __('Monitoring'),
   description: __('Manage monitoring of your system.'),

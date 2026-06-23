@@ -16322,3 +16322,27 @@ div.accounted-time-value {
     margin: 0;
   }
 }
+
+// Admin message banner, shown above #app at the top of every screen.
+.admin-message-banner {
+  flex-shrink: 0;
+
+  .admin-message-banner-item {
+    border-radius: 0;
+    margin: 0;
+
+    & + .admin-message-banner-item {
+      border-top: 1px solid hsla(0, 0%, 0%, 0.15);
+    }
+  }
+
+  .admin-message-banner-content {
+    p:first-child {
+      margin-top: 0;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

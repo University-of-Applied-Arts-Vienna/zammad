@@ -290,3 +290,12 @@ Scheduler.create_if_not_exists(
   updated_by_id: 1,
   created_by_id: 1,
 )
+Scheduler.create_if_not_exists(
+  name:          __('Process admin messages.'),
+  method:        'AdminMessage.process',
+  period:        1.minute,
+  prio:          1,
+  active:        true,
+  updated_by_id: 1,
+  created_by_id: 1,
+)

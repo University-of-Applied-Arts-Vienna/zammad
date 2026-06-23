@@ -1,0 +1,7 @@
+<div class="admin-message-banner">
+  <% for message in @messages: %>
+    <div class="alert alert--warning alert--square admin-message-banner-item" role="alert">
+      <div class="admin-message-banner-content"><%- message.message %></div>
+    </div>
+  <% end %>
+</div>

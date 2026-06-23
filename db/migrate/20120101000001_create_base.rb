@@ -1021,6 +1021,32 @@ class CreateBase < ActiveRecord::Migration[4.2]
     add_index :ai_text_tools_groups, [:group_id]
     add_foreign_key :ai_text_tools_groups, :groups
 
+    create_table :admin_messages do |t|
+      t.text :message, null: false
+
+      t.timestamp :start_at, limit: 3, null: false
+      t.timestamp :end_at,   limit: 3, null: false
+
+      t.boolean :active, null: false, default: true
+
+      t.timestamp :notification_sent_at, limit: 3, null: true
+
+      t.references :created_by, type: :integer, null: false, foreign_key: { to_table: :users }
+      t.references :updated_by, type: :integer, null: false, foreign_key: { to_table: :users }
+
+      t.timestamps limit: 3, null: false
+
+      t.index :active
+    end
+
+    create_table :admin_messages_groups, id: false do |t|
+      t.references :admin_message, foreign_key: { to_table: :admin_messages }
+      t.references :group
+    end
+    add_index :admin_messages_groups, [:admin_message_id]
+    add_index :admin_messages_groups, [:group_id]
+    add_foreign_key :admin_messages_groups, :groups
+
     create_table :ai_analytics_usages do |t|
       t.references :ai_analytics_run, null: false, foreign_key: { to_table: :ai_analytics_runs }
       t.references :user, null: false, foreign_key: { to_table: :users }, type: :integer

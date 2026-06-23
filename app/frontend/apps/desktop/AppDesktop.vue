@@ -19,6 +19,7 @@ import { useAuthenticationStore } from '#shared/stores/authentication.ts'
 import { useLocaleStore } from '#shared/stores/locale.ts'
 import { useSessionStore } from '#shared/stores/session.ts'
 
+import AdminMessageBanner from '#desktop/components/AdminMessageBanner/AdminMessageBanner.vue'
 import { useBetaUiDisclaimer } from '#desktop/components/BetaUi/composables/useBetaUiDisclaimer.ts'
 import {
   useBetaUiFeedbackConsent,
@@ -120,7 +121,12 @@ useConnection()
     <Teleport to="body">
       <CommonImageViewer />
     </Teleport>
-    <RouterView />
+    <div class="flex h-full max-h-full flex-col">
+      <AdminMessageBanner v-if="authentication.authenticated" />
+      <div class="relative min-h-0 flex-1">
+        <RouterView />
+      </div>
+    </div>
 
     <DynamicInitializer name="dialog" />
     <DynamicInitializer name="flyout" />

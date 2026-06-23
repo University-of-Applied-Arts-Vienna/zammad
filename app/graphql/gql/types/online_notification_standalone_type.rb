@@ -15,6 +15,8 @@ module Gql::Types
         ::OnlineNotificationStandalone::BulkJobData.new(**object.data.symbolize_keys)
       when 'kb_answer_generation_failed'
         ::OnlineNotificationStandalone::KbAnswerGenerationFailedData.new(**object.data.symbolize_keys)
+      when 'admin_message'
+        ::OnlineNotificationStandalone::AdminMessageData.new(**object.data.symbolize_keys)
       end
     end
   end

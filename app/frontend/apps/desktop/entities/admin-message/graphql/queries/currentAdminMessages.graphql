@@ -1,0 +1,7 @@
+query currentAdminMessages {
+  currentAdminMessages {
+    id
+    message
+    endAt
+  }
+}

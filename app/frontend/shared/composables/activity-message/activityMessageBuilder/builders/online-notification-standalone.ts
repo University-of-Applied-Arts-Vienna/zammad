@@ -2,10 +2,12 @@
 
 import type {
   OnlineNotificationStandalone,
+  OnlineNotificationStandaloneAdminMessageData,
   OnlineNotificationStandaloneBulkJobData,
   OnlineNotificationStandaloneKbAnswerGenerationFailedData,
 } from '#shared/graphql/types.ts'
 import { i18n } from '#shared/i18n.ts'
+import { domFrom } from '#shared/utils/dom.ts'
 
 import type { ActivityMessageBuilder } from '../types.ts'
 
@@ -38,6 +40,11 @@ const messageText = (
         data.ticketTitle,
         data.errorMessage,
       )
+    }
+    case 'OnlineNotificationStandaloneAdminMessageData': {
+      const data = metaObject.data as OnlineNotificationStandaloneAdminMessageData
+      // The message is HTML (sanitized server-side); show it as plain text in the bell.
+      return domFrom(data.message).textContent?.trim() || null
     }
     default:
       return null

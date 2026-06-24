@@ -4,9 +4,7 @@ Zammad::Application.routes.draw do
   scope Rails.configuration.api_path do
     resources :admin_messages, except: :edit do
       collection do
-        get  'current'
-        get  'search'
-        post 'search'
+        get 'current'
       end
     end
   end

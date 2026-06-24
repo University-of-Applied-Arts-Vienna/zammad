@@ -19,10 +19,6 @@ class AdminMessagesController < ApplicationController
     model_update_render(AdminMessage, params)
   end
 
-  def search
-    model_search_render(AdminMessage, params)
-  end
-
   def destroy
     model_destroy_render(AdminMessage, params)
   end

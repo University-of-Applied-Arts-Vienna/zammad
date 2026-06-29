@@ -29,9 +29,10 @@ class App.AdminFolderMenu
 
   # Extend a generic index config with folder grouping + a "New Folder" button.
   decorateConfig: (config) =>
-    config.groupBy        = 'admin_folder'
-    config.groupByActions = @groupByActions()
-    config.pageData      ||= {}
+    config.groupBy            = 'admin_folder'
+    config.groupByActions     = @groupByActions()
+    config.groupByCollapsible = true
+    config.pageData          ||= {}
     config.pageData.buttons ||= []
     config.pageData.buttons.unshift({ name: __('New Folder'), 'data-type': 'new-folder', class: 'btn--secondary' })
     config

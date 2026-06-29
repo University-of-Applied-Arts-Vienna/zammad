@@ -1,4 +1,4 @@
-<tr class="item<%= ' is-inactive' if @object.active is false %><%= ' '+ @object.rowClass() if @object.rowClass %>" data-id="<%= @object.id %>">
+<tr class="item<%= ' is-inactive' if @object.active is false %><%= ' is-group-collapsed' if @collapsed %><%= ' '+ @object.rowClass() if @object.rowClass %>" data-id="<%= @object.id %>"<% if @groupIndex?: %> data-group-key="<%= @groupIndex %>"<% end %>>
 <% if @sortable: %>
   <td class="table-draggable"><%- @Icon('draggable') %></td>
 <% end %>

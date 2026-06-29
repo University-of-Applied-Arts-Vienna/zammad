@@ -110,6 +110,7 @@ class App.ControllerTable extends App.Controller
   renderState:        undefined
   groupBy:            undefined
   groupByActions:     undefined
+  groupByCollapsible: undefined
   groupDirection:     undefined
 
   pagerEnabled: true
@@ -435,6 +436,9 @@ class App.ControllerTable extends App.Controller
               (e) ->
                 id = $(e.target).parents('tr').data('id')
 
+                # ignore rows without a record (e.g. a group-by/folder header)
+                return if !id
+
                 return if availabilityCheck && !availabilityCheck(id)
 
                 callback(id, e)
@@ -450,6 +454,18 @@ class App.ControllerTable extends App.Controller
         value   = $target.closest('tr').attr('data-group-by-value')
         action  = _.findWhere(@groupByActions, name: name)
         action.callback(value, e) if action
+      )
+
+    # bind collapse/expand of group-by headers (e.g. admin folders)
+    if @groupByCollapsible
+      table.on('click', 'tr.js-tableGroupHeader', (e) =>
+        return if $(e.target).closest('[data-group-action]').length
+        @toggleGroupCollapse($(e.currentTarget), table)
+      )
+      table.on('keydown', 'tr.js-tableGroupHeader', (e) =>
+        return if e.keyCode isnt 13 && e.keyCode isnt 32
+        e.preventDefault()
+        @toggleGroupCollapse($(e.currentTarget), table)
       )
 
     # bind bindCheckbox
@@ -564,7 +580,10 @@ class App.ControllerTable extends App.Controller
       columnsLength++
     groupLast = ''
     groupLastName = ''
+    groupIndex = -1
+    groupCollapsed = false
     tableBody = []
+    @collapsedGroups ?= @loadCollapsedGroups() if @groupByCollapsible
     objectsToShow = @objectsOfPage(@pagerShownPage)
     if @groupBy
       # group by raw (and not printable) value so dates work also
@@ -583,8 +602,10 @@ class App.ControllerTable extends App.Controller
           if @groupBy
             groupByName = @groupObjectName(object, @groupBy)
             if groupLastName isnt groupByName
-              groupLastName = groupByName
-              tableBody.push @renderTableGroupByRow(object, position, groupByName)
+              groupLastName  = groupByName
+              groupIndex    += 1
+              groupCollapsed = @groupByCollapsible && @isGroupCollapsed(@groupCollapseKey(object))
+              tableBody.push @renderTableGroupByRow(object, position, groupByName, groupIndex, groupCollapsed)
           for action in @actions
             # Check if the available key is used, it can be a Boolean or a function which should be called.
             if !action.available? || action.available == true
@@ -592,10 +613,11 @@ class App.ControllerTable extends App.Controller
             else if typeof action.available is 'function' && action.available(object) == true
               objectActions.push action
 
-          tableBody.push @renderTableRow(object, position, objectActions)
+          rowGroupIndex = if @groupByCollapsible then groupIndex else undefined
+          tableBody.push @renderTableRow(object, position, objectActions, rowGroupIndex, groupCollapsed)
     tableBody
 
-  renderTableGroupByRow: (object, position, groupByName) =>
+  renderTableGroupByRow: (object, position, groupByName, groupIndex = undefined, collapsed = false) =>
     ui_table_group_by_show_count = @Config.get('ui_table_group_by_show_count')
     groupByCount = undefined
     if ui_table_group_by_show_count is true
@@ -625,9 +647,13 @@ class App.ControllerTable extends App.Controller
       columnsLength:  @columnsLength
       groupByActions: groupByActions
       groupByValue:   groupByValue
+      collapsible:    @groupByCollapsible
+      groupIndex:     groupIndex
+      collapseKey:    @groupCollapseKey(object)
+      collapsed:      collapsed
     )
 
-  renderTableRow: (object, position, actions) =>
+  renderTableRow: (object, position, actions, groupIndex = undefined, collapsed = false) =>
     App.view('generic/table_row')(
       headers:    @headers
       attributes: @attributesList
@@ -638,7 +664,54 @@ class App.ControllerTable extends App.Controller
       position:   position
       object:     object
       actions:    actions
+      groupIndex: groupIndex
+      collapsed:  collapsed
     )
+
+  # Stable, per-group key used to remember the collapsed state across renders
+  #   (e.g. the folder id for admin folders, the group name otherwise).
+  groupCollapseKey: (object) =>
+    key = @groupBy
+    key += '_id' if key not of object
+    value = object[key]
+    return "id:#{value}" if value
+    "name:#{@groupObjectName(object, @groupBy)}"
+
+  isGroupCollapsed: (key) =>
+    @collapsedGroups ?= @loadCollapsedGroups()
+    @collapsedGroups[key] is true
+
+  collapsedGroupsStorageKey: =>
+    "table_collapsed_groups::#{@tableId}"
+
+  loadCollapsedGroups: =>
+    return {} if !@tableId
+    keys = App.LocalStorage.get(@collapsedGroupsStorageKey(), App.User.current()?.id) or []
+    map = {}
+    for key in keys
+      map[key] = true
+    map
+
+  saveCollapsedGroups: =>
+    return if !@tableId
+    keys = (key for key, collapsed of @collapsedGroups when collapsed)
+    App.LocalStorage.set(@collapsedGroupsStorageKey(), keys, App.User.current()?.id)
+
+  toggleGroupCollapse: ($headerRow, table) =>
+    key   = $headerRow.attr('data-group-collapse-key')
+    index = $headerRow.attr('data-group-key')
+    return if !key?
+
+    collapsed = $headerRow.toggleClass('is-collapsed').hasClass('is-collapsed')
+    $headerRow.attr('aria-expanded', !collapsed)
+    table.find("tr.item[data-group-key='#{index}']").toggleClass('is-group-collapsed', collapsed)
+
+    @collapsedGroups ?= {}
+    if collapsed
+      @collapsedGroups[key] = true
+    else
+      delete @collapsedGroups[key]
+    @saveCollapsedGroups()
 
   tableHeadersHasChanged: =>
     return true if @overviewAttributes isnt @lastOverview

@@ -1679,6 +1679,31 @@ td.align-right {
   visibility: visible;
 }
 
+.table > tbody > tr.js-tableGroupHeader {
+  cursor: pointer;
+  user-select: none;
+}
+
+.table > tbody > tr.is-group-collapsed {
+  display: none;
+}
+
+.table-group-by-arrow {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+  opacity: 0.6;
+  margin-right: 6px;
+  vertical-align: middle;
+  transition: transform 0.1s ease;
+}
+
+.table > tbody > tr.js-tableGroupHeader.is-collapsed .table-group-by-arrow {
+  transform: rotate(-90deg);
+
+  @include rtl(transform, rotate(90deg));
+}
+
 .table > tbody > tr.u-center > td {
   vertical-align: middle;
 }

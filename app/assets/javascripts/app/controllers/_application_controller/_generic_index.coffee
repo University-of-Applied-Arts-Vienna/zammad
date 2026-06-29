@@ -209,6 +209,7 @@ class App.ControllerGenericIndex extends App.Controller
         explanation: @pageData.explanation
         groupBy: @groupBy
         groupByActions: @groupByActions
+        groupByCollapsible: @groupByCollapsible
         dndCallback: @dndCallback
         cloneCallback: @clone
       },

@@ -1,5 +1,6 @@
-<tr<% if @groupByValue: %> data-group-by-value="<%= @groupByValue %>"<% end %>>
+<tr<% if @groupByValue: %> data-group-by-value="<%= @groupByValue %>"<% end %><% if @collapsible: %> class="js-tableGroupHeader<%= ' is-collapsed' if @collapsed %>" data-group-key="<%= @groupIndex %>" data-group-collapse-key="<%= @collapseKey %>" role="button" tabindex="0" aria-expanded="<%= !@collapsed %>"<% end %>>
   <td colspan="<%= @columnsLength %>">
+    <% if @collapsible: %><%- @Icon('arrow-down', 'table-group-by-arrow') %><% end %>
     <b><%- @groupByName %><% if @groupByCount:%> (<%= @groupByCount %>)<% end %></b>
     <% if @groupByActions: %>
       <span class="table-group-by-actions">

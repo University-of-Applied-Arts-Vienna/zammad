@@ -4,7 +4,14 @@ class Macro extends App.ControllerSubContent
   constructor: ->
     super
 
-    @genericController = new App.ControllerGenericIndex(
+    container = @el.closest('.content')
+    @folderMenu = new App.AdminFolderMenu(
+      targetModel: 'Macro'
+      container:   container
+      onChange:    => @genericController?.render()
+    )
+
+    @genericController = new App.ControllerGenericIndex(@folderMenu.decorateConfig(
       el: @el
       id: @id
       genericObject: 'Macro'
@@ -24,8 +31,10 @@ class Macro extends App.ControllerSubContent
         buttons: [
           { name: __('New Macro'), 'data-type': 'new', class: 'btn--success' }
         ]
-      container: @el.closest('.content')
-    )
+      container: container
+    ))
+
+    @folderMenu.preload(=> @genericController.render())
 
   show: (params) =>
     for key, value of params

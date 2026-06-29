@@ -6,7 +6,14 @@ class Job extends App.ControllerSubContent
 
     @fetchTimezones()
 
-    @genericController = new Index(
+    container = @el.closest('.content')
+    @folderMenu = new App.AdminFolderMenu(
+      targetModel: 'Job'
+      container:   container
+      onChange:    => @genericController?.render()
+    )
+
+    @genericController = new Index(@folderMenu.decorateConfig(
       el: @el
       id: @id
       genericObject: 'Job'
@@ -26,12 +33,14 @@ class Job extends App.ControllerSubContent
         buttons: [
           { name: __('New Scheduler'), 'data-type': 'new', class: 'btn--success' }
         ]
-      container: @el.closest('.content')
+      container: container
       veryLarge: true
       handlers: [
         App.FormHandlerAdminJobObjectName.run
       ]
-    )
+    ))
+
+    @folderMenu.preload(=> @genericController.render())
 
   show: (params) =>
     for key, value of params

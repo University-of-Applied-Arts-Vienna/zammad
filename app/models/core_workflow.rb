@@ -10,6 +10,8 @@ class CoreWorkflow < ApplicationModel
   include CoreWorkflow::Assets
   include CoreWorkflow::Search
 
+  belongs_to :admin_folder, optional: true
+
   core_workflow_screens 'create', 'edit'
 
   default_scope { order(:priority, :id) }

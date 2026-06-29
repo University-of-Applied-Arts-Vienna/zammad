@@ -12,6 +12,8 @@ class Trigger < ApplicationModel
 
   include Trigger::Assets
 
+  belongs_to :admin_folder, optional: true
+
   store     :condition
   store     :perform
   validates :name,    presence: true, uniqueness: { case_sensitive: false }

@@ -6,7 +6,14 @@ class CoreWorkflow extends App.ControllerSubContent
 
     @setAttributes()
 
-    @genericController = new App.ControllerGenericIndex(
+    container = @el.closest('.content')
+    @folderMenu = new App.AdminFolderMenu(
+      targetModel: 'CoreWorkflow'
+      container:   container
+      onChange:    => @genericController?.render()
+    )
+
+    @genericController = new App.ControllerGenericIndex(@folderMenu.decorateConfig(
       el: @el
       id: @id
       genericObject: 'CoreWorkflow'
@@ -26,12 +33,14 @@ class CoreWorkflow extends App.ControllerSubContent
         buttons: [
           { name: __('New Workflow'), 'data-type': 'new', class: 'btn--success' }
         ]
-      container: @el.closest('.content')
+      container: container
       veryLarge: true
       handlers: [
         App.FormHandlerAdminCoreWorkflow.run
       ]
-    )
+    ))
+
+    @folderMenu.preload(=> @genericController.render())
 
   show: (params) =>
     for key, value of params

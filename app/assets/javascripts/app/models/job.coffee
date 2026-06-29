@@ -1,9 +1,10 @@
 class App.Job extends App.Model
-  @configure 'Job', 'name', 'object', 'timeplan', 'condition', 'perform', 'disable_notification', 'note', 'active', 'localization', 'timezone'
+  @configure 'Job', 'name', 'object', 'timeplan', 'condition', 'perform', 'disable_notification', 'note', 'active', 'localization', 'timezone', 'admin_folder_id'
   @extend Spine.Model.Ajax
   @url: @apiPath + '/jobs'
   @configure_attributes = [
     { name: 'name',                 display: __('Name'),                            tag: 'input',    type: 'text', limit: 100, null: false },
+    { name: 'admin_folder_id',      display: __('Folder'),                          tag: 'select',   multiple: false, null: true, relation: 'AdminFolder', nulloption: true, filter: App.AdminFolder.filterForTargetModel('Job') },
     { name: 'timeplan',             display: __('When should the job run?'),        tag: 'timer', null: true },
     { name: 'object',               display: __('Object'),                          tag: 'select', null: true, options: { Ticket: __('Ticket'), User: __('User'), Organization: __('Organization') }, default: 'Ticket', translate: true },
     { name: 'condition',            display: __('Conditions for affected objects'), tag: 'object_selector', null: false, executionTime: true, noCurrentUser: true },

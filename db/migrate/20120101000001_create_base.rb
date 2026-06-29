@@ -800,6 +800,23 @@ class CreateBase < ActiveRecord::Migration[4.2]
     add_foreign_key :mentions, :users, column: :updated_by_id
     add_foreign_key :mentions, :users, column: :user_id
 
+    create_table :admin_folders do |t|
+      t.column :name,          :string,  limit: 250, null: false
+      t.column :target_model,  :string,  limit: 100, null: false
+      t.column :parent_id,     :integer,             null: true
+      t.column :prio,          :integer,             null: false
+      t.column :active,        :boolean,             null: false, default: true
+      t.column :updated_by_id, :integer,             null: false
+      t.column :created_by_id, :integer,             null: false
+      t.timestamps limit: 3, null: false
+    end
+    add_index :admin_folders, [:name]
+    add_index :admin_folders, [:target_model]
+    add_index :admin_folders, [:parent_id]
+    add_foreign_key :admin_folders, :admin_folders, column: :parent_id
+    add_foreign_key :admin_folders, :users, column: :created_by_id
+    add_foreign_key :admin_folders, :users, column: :updated_by_id
+
     create_table :jobs do |t|
       t.column :name,                 :string,  limit: 250,    null: false
       t.column :timeplan,             :string,  limit: 2500,   null: false
@@ -817,13 +834,16 @@ class CreateBase < ActiveRecord::Migration[4.2]
       t.column :timezone,             :string,  limit: 250,    null: true
       t.column :note,                 :string,  limit: 250,    null: true
       t.column :active,               :boolean,                null: false, default: false
+      t.column :admin_folder_id,      :integer,                null: true
       t.column :updated_by_id,        :integer,                null: false
       t.column :created_by_id,        :integer,                null: false
       t.timestamps limit: 3, null: false
     end
     add_index :jobs, [:name], unique: true
+    add_index :jobs, [:admin_folder_id]
     add_foreign_key :jobs, :users, column: :created_by_id
     add_foreign_key :jobs, :users, column: :updated_by_id
+    add_foreign_key :jobs, :admin_folders, column: :admin_folder_id
 
     create_table :core_workflows do |t|
       t.string :name,                     limit: 100, null: false
@@ -836,13 +856,16 @@ class CreateBase < ActiveRecord::Migration[4.2]
       t.boolean :stop_after_match,        null: false, default: false
       t.boolean :changeable,              null: false, default: true
       t.integer :priority,                null: false, default: 0
+      t.integer :admin_folder_id,         null: true
       t.integer :updated_by_id,           null: false
       t.integer :created_by_id,           null: false
       t.timestamps limit: 3, null: false
     end
     add_index :core_workflows, [:name], unique: true
+    add_index :core_workflows, [:admin_folder_id]
     add_foreign_key :core_workflows, :users, column: :created_by_id
     add_foreign_key :core_workflows, :users, column: :updated_by_id
+    add_foreign_key :core_workflows, :admin_folders, column: :admin_folder_id
 
     create_table :ldap_sources do |t|
       t.string :name,                     limit: 100, null: false

@@ -7,7 +7,14 @@ class Trigger extends App.ControllerSubContent
 
     @fetchTimezones()
 
-    @genericController = new Index(
+    container = @el.closest('.content')
+    @folderMenu = new App.AdminFolderMenu(
+      targetModel: 'Trigger'
+      container:   container
+      onChange:    => @genericController?.render()
+    )
+
+    @genericController = new Index(@folderMenu.decorateConfig(
       el: @el
       id: @id
       genericObject: 'Trigger'
@@ -27,9 +34,11 @@ class Trigger extends App.ControllerSubContent
         buttons: [
           { name: __('New Trigger'), 'data-type': 'new', class: 'btn--success' }
         ]
-      container: @el.closest('.content')
+      container: container
       veryLarge: true
-    )
+    ))
+
+    @folderMenu.preload(=> @genericController.render())
 
   show: (params) =>
     for key, value of params

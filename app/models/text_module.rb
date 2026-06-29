@@ -11,6 +11,8 @@ class TextModule < ApplicationModel
   include CanSearch
   include HasOptionalGroups
 
+  belongs_to :admin_folder, optional: true
+
   validates :name,    presence: true
   validates :content, presence: true
 

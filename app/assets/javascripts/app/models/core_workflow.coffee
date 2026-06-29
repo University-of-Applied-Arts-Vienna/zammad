@@ -1,9 +1,10 @@
 class App.CoreWorkflow extends App.Model
-  @configure 'CoreWorkflow', 'name', 'object', 'preferences', 'condition_saved', 'condition_selected', 'perform', 'stop_after_match', 'priority', 'active'
+  @configure 'CoreWorkflow', 'name', 'object', 'preferences', 'condition_saved', 'condition_selected', 'perform', 'stop_after_match', 'priority', 'active', 'admin_folder_id'
   @extend Spine.Model.Ajax
   @url: @apiPath + '/core_workflows'
   @configure_attributes = [
     { name: 'name', display: __('Name'), tag: 'input', type: 'text', limit: 100, null: false },
+    { name: 'admin_folder_id', display: __('Folder'), tag: 'select', multiple: false, null: true, relation: 'AdminFolder', nulloption: true, filter: App.AdminFolder.filterForTargetModel('CoreWorkflow') },
     { name: 'object', display: __('Object'), tag: 'select', null: false, nulloption: true, translate: true },
     { name: 'preferences::screen', display: __('Context'), tag: 'multiselect', translate: true, null: true, nulloption: true, multiple: true },
     { name: 'condition_selected', display: __('Selected conditions'), tag: 'core_workflow_condition', disable_objects: ['article'], null: true, preview: false },

@@ -342,14 +342,17 @@ class CreateTicket < ActiveRecord::Migration[4.2]
       t.column :activator,                :string, limit: 50,     null: false, default: 'action'
       t.column :execution_condition_mode, :string, limit: 50,     null: false, default: 'selective'
       t.column :active,                   :boolean,               null: false, default: true
+      t.column :admin_folder_id,          :integer,               null: true
       t.column :updated_by_id,            :integer,               null: false
       t.column :created_by_id,            :integer,               null: false
       t.timestamps limit: 3, null: false
     end
     add_index :triggers, [:name], unique: true
     add_index :triggers, %i[active activator]
+    add_index :triggers, [:admin_folder_id]
     add_foreign_key :triggers, :users, column: :created_by_id
     add_foreign_key :triggers, :users, column: :updated_by_id
+    add_foreign_key :triggers, :admin_folders, column: :admin_folder_id
 
     create_table :link_types do |t|
       t.column :name,         :string, limit: 250,   null: false
@@ -399,13 +402,16 @@ class CreateTicket < ActiveRecord::Migration[4.2]
       t.column :content,              :text,    limit: 10.megabytes + 1, null: false
       t.column :note,                 :string,  limit: 250,  null: true
       t.column :active,               :boolean,              null: false, default: true
+      t.column :admin_folder_id,      :integer,              null: true
       t.column :updated_by_id,        :integer,              null: false
       t.column :created_by_id,        :integer,              null: false
       t.timestamps limit: 3, null: false
     end
     add_index :text_modules, [:name]
+    add_index :text_modules, [:admin_folder_id]
     add_foreign_key :text_modules, :users, column: :created_by_id
     add_foreign_key :text_modules, :users, column: :updated_by_id
+    add_foreign_key :text_modules, :admin_folders, column: :admin_folder_id
 
     create_table :text_modules_groups, id: false do |t|
       t.references :text_module
@@ -469,13 +475,16 @@ class CreateTicket < ActiveRecord::Migration[4.2]
       t.boolean :active,                                null: false, default: true
       t.string  :ux_flow_next_up,                       null: false, default: 'none'
       t.string  :note, limit: 250, null: true
+      t.integer :admin_folder_id,                       null: true
       t.integer :updated_by_id,                         null: false
       t.integer :created_by_id,                         null: false
       t.timestamps limit: 3, null: false
     end
     add_index :macros, [:name], unique: true
+    add_index :macros, [:admin_folder_id]
     add_foreign_key :macros, :users, column: :created_by_id
     add_foreign_key :macros, :users, column: :updated_by_id
+    add_foreign_key :macros, :admin_folders, column: :admin_folder_id
 
     create_table :chats do |t|
       t.string  :name, limit: 250, null: true

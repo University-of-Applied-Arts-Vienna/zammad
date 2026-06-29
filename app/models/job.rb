@@ -13,6 +13,8 @@ class Job < ApplicationModel
   include Job::Assets
   include Job::SearchIndex
 
+  belongs_to :admin_folder, optional: true
+
   OBJECTS_BATCH_SIZE = 2_000
 
   store     :condition

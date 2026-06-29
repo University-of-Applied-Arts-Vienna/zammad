@@ -12,6 +12,8 @@ class Macro < ApplicationModel
   include HasOptionalGroups
   include TouchesPerformReferences
 
+  belongs_to :admin_folder, optional: true
+
   store     :perform
   validates :perform,         'validations/verify_perform_rules': true
   validates :name,            presence: true, uniqueness: { case_sensitive: false }

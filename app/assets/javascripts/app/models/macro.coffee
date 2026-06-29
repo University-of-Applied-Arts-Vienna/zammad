@@ -1,9 +1,10 @@
 class App.Macro extends App.Model
-  @configure 'Macro', 'name', 'perform', 'ux_flow_next_up', 'note', 'group_ids', 'active'
+  @configure 'Macro', 'name', 'perform', 'ux_flow_next_up', 'note', 'group_ids', 'active', 'admin_folder_id'
   @extend Spine.Model.Ajax
   @url: @apiPath + '/macros'
   @configure_attributes = [
     { name: 'name',            display: __('Name'),              tag: 'input', type: 'text', translate: true, limit: 100, null: false },
+    { name: 'admin_folder_id', display: __('Folder'),            tag: 'select', multiple: false, null: true, relation: 'AdminFolder', nulloption: true, filter: App.AdminFolder.filterForTargetModel('Macro') },
     { name: 'perform',         display: __('Actions'),           tag: 'ticket_perform_action', macro: true, notification: true, ai_agent: true, null: true},
     { name: 'ux_flow_next_up', display: __('Once completed…'), tag: 'select', default: 'none', translate: true, options: {
         none: __('Stay on tab'), next_task: __('Close tab'), next_task_on_close: __('Close tab on ticket close'), next_from_overview: __('Advance to next ticket from overview')

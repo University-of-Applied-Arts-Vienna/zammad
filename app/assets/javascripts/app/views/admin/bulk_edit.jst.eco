@@ -1,0 +1,21 @@
+<p class="overview-bulk-intro"><%- @T('Editing %s items at once. Only the settings you enable below will be changed; all other settings of each item stay untouched.', @count) %></p>
+
+<fieldset class="overview-bulk-section" data-section="folder">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_folder" data-section="folder">
+    <span class="overview-bulk-section-title"><%- @T('Folder') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+  </div>
+</fieldset>
+
+<fieldset class="overview-bulk-section" data-section="active">
+  <label class="overview-bulk-section-toggle">
+    <input type="checkbox" class="js-toggle" name="change_active" data-section="active">
+    <span class="overview-bulk-section-title"><%- @T('Active') %></span>
+  </label>
+  <div class="overview-bulk-section-body">
+    <div class="js-form"></div>
+  </div>
+</fieldset>

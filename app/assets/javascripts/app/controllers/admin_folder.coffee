@@ -12,22 +12,27 @@ class App.AdminFolderNew extends App.ControllerGenericNew
     super
 
 # Reusable folder management for an admin index page (App.ControllerSubContent).
-#   It extends the generic index config with folder grouping and a "New Folder"
-#   button, and provides the create/edit/delete folder dialogs. One instance is
-#   created per admin page, scoped to its target model (e.g. 'Trigger').
+#   It extends the generic index config with folder grouping, a "New Folder"
+#   button and multi-select bulk editing, and provides the create/edit/delete
+#   folder dialogs. One instance is created per admin page, scoped to its target
+#   model (e.g. 'Trigger').
 class App.AdminFolderMenu
+  bulkEditLabel: __('Edit selected')
+
   constructor: (options = {}) ->
     @targetModel = options.targetModel
     @container   = options.container
     @onChange    = options.onChange
 
-    # The "New Folder" button is re-rendered with the list, so bind it via event
+    # The buttons are re-rendered with the list, so bind them via event
     #   delegation on the stable container element.
     if @container
-      @container.off('click.adminFolder', '[data-type=new-folder]')
+      @container.off('click.adminFolder')
       @container.on('click.adminFolder', '[data-type=new-folder]', @newFolder)
+      @container.on('click.adminFolder', '[data-type=admin-bulk-edit]:not(.is-disabled)', @bulkEdit)
 
-  # Extend a generic index config with folder grouping + a "New Folder" button.
+  # Extend a generic index config with folder grouping, a "New Folder" button and
+  #   checkbox multi-select with a bulk-edit button.
   decorateConfig: (config) =>
     config.groupBy            = 'admin_folder'
     config.groupByActions     = @groupByActions()
@@ -35,7 +40,52 @@ class App.AdminFolderMenu
     config.pageData          ||= {}
     config.pageData.buttons ||= []
     config.pageData.buttons.unshift({ name: __('New Folder'), 'data-type': 'new-folder', class: 'btn--secondary' })
+    config.pageData.buttons.unshift({ name: @bulkEditLabel, 'data-type': 'admin-bulk-edit', class: 'btn--primary js-adminBulkEdit is-disabled' })
+    config.pageData.tableExtend = _.extend(
+      {
+        checkbox: true
+        bindCheckbox:
+          events:
+            change:     => @updateBulkEditButton()
+            select_all: => @updateBulkEditButton()
+      }
+      config.pageData.tableExtend
+    )
     config
+
+  selectedIds: =>
+    ids = []
+    @container.find('[name="bulk"]:checked').each((_index, element) ->
+      ids.push parseInt($(element).val(), 10)
+    )
+    ids
+
+  # Reflect the current selection on the bulk-edit button (count + enabled state).
+  #   The button is rendered by the generic index, so it is updated in place.
+  updateBulkEditButton: =>
+    button = @container.find('[data-type=admin-bulk-edit]')
+    return if !button.length
+
+    count = @selectedIds().length
+    label = App.i18n.translateContent(@bulkEditLabel)
+    label = "#{label} (#{count})" if count > 0
+    button.text(label)
+    button.toggleClass('is-disabled', count is 0)
+
+  bulkEdit: (e) =>
+    e?.preventDefault()
+
+    ids = @selectedIds()
+    return if _.isEmpty(ids)
+
+    new App.AdminBulkEdit(
+      genericObject: @targetModel
+      ids:           ids
+      callback:      =>
+        @container.find('[name="bulk"]:checked, [name="bulk_all"]:checked').prop('checked', false)
+        @updateBulkEditButton()
+        @onChange?()
+    )
 
   groupByActions: =>
     [

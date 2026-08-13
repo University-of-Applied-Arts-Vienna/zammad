@@ -7,6 +7,7 @@ import { renderComponent } from '#tests/support/components/index.ts'
 import { createDummyArticle } from '#shared/entities/ticket-article/__tests__/mocks/ticket-articles.ts'
 import { createDummyTicket } from '#shared/entities/ticket-article/__tests__/mocks/ticket.ts'
 import { convertToGraphQLId } from '#shared/graphql/utils.ts'
+import { i18n } from '#shared/i18n.ts'
 
 import { provideTicketInformationMocks } from '#desktop/entities/ticket/__tests__/mocks/provideTicketInformationMocks.ts'
 import ArticleBubbleBody from '#desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue'
@@ -40,6 +41,10 @@ const renderBody = (
 }
 
 describe('ArticleBubbleBody', () => {
+  afterEach(() => {
+    i18n.setTranslationMap(new Map())
+  })
+
   it('displays html article body with meta information display active', async () => {
     const article = createDummyArticle({
       bodyWithUrls: 'test &amp; body',
@@ -90,6 +95,60 @@ describe('ArticleBubbleBody', () => {
         description: 'Author name and article creation date',
       }),
     ).not.toBeInTheDocument()
+  })
+
+  describe('bodyRenderingError', () => {
+    const errorMsg =
+      'This message cannot be displayed due to HTML processing issues. Download the raw message below and open it via an Email client if you still wish to view it.'
+
+    it('displays the error message when bodyRenderingError is true', async () => {
+      const article = createDummyArticle({
+        bodyWithUrls: errorMsg,
+        contentType: 'text/html',
+        bodyRenderingError: true,
+      })
+
+      const wrapper = renderBody(article, false)
+      expect(await wrapper.findByText(errorMsg)).toBeInTheDocument()
+    })
+
+    it('translates the error message according to the active locale', async () => {
+      i18n.setTranslationMap(
+        new Map([
+          [
+            errorMsg,
+            'Diese Nachricht kann aufgrund von HTML-Verarbeitungsproblemen nicht angezeigt werden.',
+          ],
+        ]),
+      )
+
+      const article = createDummyArticle({
+        bodyWithUrls: errorMsg,
+        contentType: 'text/html',
+        bodyRenderingError: true,
+      })
+
+      const wrapper = renderBody(article, false)
+      expect(
+        await wrapper.findByText(
+          'Diese Nachricht kann aufgrund von HTML-Verarbeitungsproblemen nicht angezeigt werden.',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('escapes HTML in the body instead of rendering it', () => {
+      const article = createDummyArticle({
+        bodyWithUrls: '<img src=x onerror="globalThis.__xss=1">',
+        contentType: 'text/html',
+        bodyRenderingError: true,
+      })
+
+      const wrapper = renderBody(article, false)
+      const body = wrapper.container.querySelector('.inner-article-body')
+
+      expect(body?.querySelector('img')).toBeNull()
+      expect(body?.textContent).toContain('<img src=x onerror="globalThis.__xss=1">')
+    })
   })
 
   describe('highlight a11y (aria-details)', () => {

@@ -505,7 +505,7 @@ msgid "%s ago"
 msgstr "prije %s"
 
 #: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleFooter.vue:31
-#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:217
+#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:221
 msgid "%s attached files"
 msgstr "%s privitak(a)"
 
@@ -547,7 +547,7 @@ msgstr "%s kreirana uloga |%s|"
 msgid "%s created ticket |%s|"
 msgstr "%s kreiran ticket |%s|"
 
-#: app/assets/javascripts/app/models/user.coffee:208
+#: app/assets/javascripts/app/models/user.coffee:217
 #: app/frontend/shared/composables/activity-message/activityMessageBuilder/builders/user.ts:21
 msgid "%s created user |%s|"
 msgstr "%s kreiran korisnik |%s|"
@@ -577,7 +577,7 @@ msgstr ""
 "%s e-mailova pronađeno u Vašem e-sandučiću. Svi će biti prebačeni iz e-"
 "sandučića i preneseni u Zammad."
 
-#: app/assets/javascripts/app/models/user.coffee:222
+#: app/assets/javascripts/app/models/user.coffee:231
 #: app/frontend/shared/composables/activity-message/activityMessageBuilder/builders/user.ts:29
 msgid "%s ended switch to |%s|!"
 msgstr "%s završeno preuzimanje |%s|!"
@@ -704,7 +704,7 @@ msgstr ""
 "%s odabranih. Koristite navigacijske tipke kako biste odabrali krajnje točke "
 "i zatim pritisnite razmak."
 
-#: app/assets/javascripts/app/models/user.coffee:212
+#: app/assets/javascripts/app/models/user.coffee:221
 #: app/frontend/shared/composables/activity-message/activityMessageBuilder/builders/user.ts:25
 msgid "%s started a new session"
 msgstr "%s započeo novu sesiju"
@@ -714,7 +714,7 @@ msgstr "%s započeo novu sesiju"
 msgid "%s subdomain"
 msgstr "%s poddomena"
 
-#: app/assets/javascripts/app/models/user.coffee:217
+#: app/assets/javascripts/app/models/user.coffee:226
 #: app/frontend/shared/composables/activity-message/activityMessageBuilder/builders/user.ts:27
 msgid "%s switched to |%s|!"
 msgstr "%s započeo sesiju kao |%s|!"
@@ -773,7 +773,7 @@ msgstr "%s ažurirao ulogu |%s|"
 msgid "%s updated ticket |%s|"
 msgstr "%s ažurirao ticket |%s|"
 
-#: app/assets/javascripts/app/models/user.coffee:210
+#: app/assets/javascripts/app/models/user.coffee:219
 #: app/frontend/shared/composables/activity-message/activityMessageBuilder/builders/user.ts:23
 msgid "%s updated user |%s|"
 msgstr "%s ažurirao korisnika |%s|"
@@ -906,7 +906,7 @@ msgid "+ %s more"
 msgstr "% drugih"
 
 #: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleFooter.vue:30
-#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:216
+#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:220
 msgid "1 attached file"
 msgstr "1 priložena datoteka"
 
@@ -1822,7 +1822,7 @@ msgstr "Dodaj oznaku"
 msgid "Add this class to a button on your page that should open the chat."
 msgstr "Dodaj ovu razinu gumbu na stranici koji bi trebao otvoriti chat."
 
-#: app/models/ai/agent/type/ticket_tagger.rb:164
+#: app/models/ai/agent/type/ticket_tagger.rb:169
 #, fuzzy
 #| msgid "Update existing records"
 msgid "Add to existing tags"
@@ -1860,7 +1860,6 @@ msgstr "Adresa"
 msgid "Address of the proxy server for http and https resources."
 msgstr "Adresa proxy poslužitelja za http i https resurse."
 
-#: app/assets/javascripts/app/controllers/_default_navbar.coffee:13
 #: db/seeds/roles.rb:5
 msgid "Admin"
 msgstr "Admin"
@@ -1895,6 +1894,7 @@ msgid "Admin password login instructions were sent to your email address."
 msgstr ""
 "Upute za prijavu administratorskom lozinkom su poslane na Vašu e-mail adresu."
 
+#: app/assets/javascripts/app/controllers/_default_navbar.coffee:13
 #: app/frontend/apps/desktop/components/layout/LayoutSidebar/LeftSidebar/MenuContainer/AdminMenu/plugins/admin.ts:9
 msgid "Administration"
 msgstr "Administracija"
@@ -2626,7 +2626,7 @@ msgstr "Ukupan broj članaka"
 msgid "Article Language Detection"
 msgstr "Prepoznavanje jezika članka"
 
-#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:275
+#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:279
 msgid "Article actions"
 msgstr "Radnje članaka"
 
@@ -2793,7 +2793,7 @@ msgstr "Prilozi su pohranjeni u datotečnom sustavu."
 msgid "Attendees"
 msgstr "Sudionici"
 
-#: app/assets/javascripts/app/models/user.coffee:12
+#: app/assets/javascripts/app/models/user.coffee:21
 #: app/frontend/apps/desktop/entities/user/composables/useUserEdit.ts:80
 #: app/frontend/apps/mobile/entities/user/composables/useUserEdit.ts:67
 msgid ""
@@ -2893,7 +2893,7 @@ msgstr "Autentifikacija nije moguća (nije ponuđena)"
 
 #: app/controllers/application_controller/authenticates.rb:17
 #: app/graphql/gql/context/current_user_aware.rb:7
-#: app/policies/pundit_policy.rb:18 lib/user_context.rb:37
+#: app/policies/pundit_policy.rb:18 lib/user_context.rb:44
 msgid "Authentication required"
 msgstr "Autentifikacija obavezna"
 
@@ -2925,7 +2925,7 @@ msgstr "Autentifikacija putem tajne (app secret)"
 msgid "Author"
 msgstr "Autor"
 
-#: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:120
+#: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:124
 msgid "Author name and article creation date"
 msgstr "Ime autora i vrijeme stvaranja članka"
 
@@ -3046,7 +3046,7 @@ msgstr "Dostupno za sljedeće uloge"
 msgid "Available methods"
 msgstr "Dostupne metode"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:119
+#: app/models/ai/agent/type/ticket_tagger.rb:124
 msgid ""
 "Available tags are limited to existing in the manage tags section. AI agent "
 "won't be able to generate new ones. %l"
@@ -3057,7 +3057,7 @@ msgid "Available types for a new ticket"
 msgstr "Mogući tipovi za novi ticket"
 
 #: app/assets/javascripts/app/controllers/_profile/avatar.coffee:3
-#: app/assets/javascripts/app/models/user.coffee:29
+#: app/assets/javascripts/app/models/user.coffee:38
 #: app/assets/javascripts/app/views/customer_chat/setting.jst.eco:22
 #: app/assets/javascripts/app/views/profile/avatar.jst.eco:3
 #: app/assets/javascripts/app/views/profile/imageCropper.jst.eco:3
@@ -3978,7 +3978,7 @@ msgstr "Odaberite grupu gdje će biti dodane poruke."
 msgid "Choose the group to which page posts will get added."
 msgstr "Odaberite grupu gdje će biti dodane objave stranice."
 
-#: app/models/ai/agent/type/ticket_tagger.rb:168
+#: app/models/ai/agent/type/ticket_tagger.rb:173
 msgid ""
 "Choose whether the suggested tags are added to or replace the existing tags "
 "on the ticket."
@@ -4055,7 +4055,7 @@ msgstr "Unesite novu lozinku."
 msgid "Choose your preferred two-factor authentication method to set it up."
 msgstr "Postavite Vašu preferiranu dvofaktorsku metodu autentifikacije."
 
-#: app/assets/javascripts/app/models/user.coffee:332
+#: app/assets/javascripts/app/models/user.coffee:341
 msgid "Christmas holiday"
 msgstr "Božićni blagdani"
 
@@ -4427,7 +4427,7 @@ msgstr "Konfiguriraj aplikaciju"
 msgid "Configure Basic Settings"
 msgstr "Konfiguriranje osnovnih postavki"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:156
+#: app/models/ai/agent/type/ticket_tagger.rb:161
 msgid ""
 "Configure the way required number of resulting tags are added or replaced in "
 "the ticket tags list."
@@ -5128,7 +5128,7 @@ msgstr "Interni članak stvoren"
 #: app/assets/javascripts/app/models/knowledge_base_answer_translation.coffee:7
 #: app/assets/javascripts/app/models/organization.coffee:9
 #: app/assets/javascripts/app/models/ticket.coffee:28
-#: app/assets/javascripts/app/models/user.coffee:15
+#: app/assets/javascripts/app/models/user.coffee:24
 #: app/assets/javascripts/app/views/integration/pgp_list.jst.eco:17
 #: app/assets/javascripts/app/views/widget/http_log.jst.eco:19
 #: app/assets/javascripts/app/views/widget/http_log_show.jst.eco:23
@@ -5161,7 +5161,7 @@ msgstr "Kreirano u:"
 #: app/assets/javascripts/app/models/sla.coffee:10
 #: app/assets/javascripts/app/models/ticket.coffee:27
 #: app/assets/javascripts/app/models/ticket_article.coffee:15
-#: app/assets/javascripts/app/models/user.coffee:14
+#: app/assets/javascripts/app/models/user.coffee:23
 #: app/frontend/shared/entities/organization/stores/objectAttributes.ts:14
 #: app/frontend/shared/entities/ticket/stores/objectAttributes.ts:91
 #: app/frontend/shared/entities/user/stores/objectAttributes.ts:14
@@ -5480,7 +5480,7 @@ msgstr "Vrijednost minuta smanjenja"
 msgid "Decrement seconds value"
 msgstr "Vrijednost sekundi smanjenja"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:313
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:315
 msgid "Decryption failed!"
 msgstr "Dešifriranje nije uspjelo!"
 
@@ -5489,7 +5489,7 @@ msgstr "Dešifriranje nije uspjelo!"
 msgid "Decryption failed! %s"
 msgstr "Dešifriranje nije uspjelo! %s"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:311
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:313
 #: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleSecurityBadge.vue:102
 #: app/frontend/shared/composables/useArticleSecurity.ts:110
 msgid "Decryption was successful."
@@ -5627,7 +5627,7 @@ msgstr ""
 "i mapirajte svoje agente na njega. Na taj način Zammad može pomoći Vašim "
 "agentima pokazujući im samo relevantne unose poziva i obavijesti."
 
-#: app/models/ai/agent/type/ticket_tagger.rb:115
+#: app/models/ai/agent/type/ticket_tagger.rb:120
 msgid "Define rules for adding tags in the system."
 msgstr ""
 
@@ -6594,7 +6594,7 @@ msgstr ""
 #: app/assets/javascripts/app/controllers/data_privacy.coffee:188
 #: app/assets/javascripts/app/controllers/knowledge_base/delete_action.coffee:9
 #: app/assets/javascripts/app/controllers/package.coffee:54
-#: app/assets/javascripts/app/controllers/user.coffee:101
+#: app/assets/javascripts/app/controllers/user.coffee:102
 #: app/assets/javascripts/app/controllers/user_profile/action_row.coffee:90
 #: app/assets/javascripts/app/lib/mixins/knowledge_base_actions.coffee:26
 #: app/assets/javascripts/app/views/calendar/index.jst.eco:80
@@ -7238,7 +7238,7 @@ msgstr "Preuzmi izvorni e-mail"
 msgid "Download raw email"
 msgstr "Preuzmi neobrađeni e-mail"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:339
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:341
 msgid "Downloading attachments…"
 msgstr "Preuzimanje privitaka…"
 
@@ -7331,7 +7331,7 @@ msgstr ""
 "Vaših atributa ticketa/oznaka u usporedbi s Vašom trenutnom upotrebom "
 "dinamičkih polja u OTRS-u."
 
-#: app/assets/javascripts/app/models/user.coffee:334
+#: app/assets/javascripts/app/models/user.coffee:343
 msgid "Easter holiday"
 msgstr "Uskršnji blagdani"
 
@@ -7503,7 +7503,7 @@ msgstr "Elasticsearch verzija"
 #: app/assets/javascripts/app/controllers/getting_started/channel.coffee:15
 #: app/assets/javascripts/app/models/email_address.coffee:2
 #: app/assets/javascripts/app/models/group.coffee:12
-#: app/assets/javascripts/app/models/user.coffee:11
+#: app/assets/javascripts/app/models/user.coffee:20
 #: app/assets/javascripts/app/views/getting_started/email.jst.eco:6
 #: app/assets/javascripts/app/views/import/kayako.jst.eco:42
 #: app/assets/javascripts/app/views/import/zendesk.jst.eco:39
@@ -8217,6 +8217,15 @@ msgstr ""
 "Greška prilikom dohvaćanja i-doit informacija. Molimo, obratite se "
 "administratoru."
 
+#: lib/secure_mailing/smime/incoming.rb:99
+#, fuzzy
+#| msgid ""
+#| "Error fetching i-doit information. Please contact your administrator."
+msgid "Error while verifying signature, please contact your administrator."
+msgstr ""
+"Greška prilikom dohvaćanja i-doit informacija. Molimo, obratite se "
+"administratoru."
+
 #: db/seeds/overviews.rb:160
 msgid "Escalated Tickets"
 msgstr "Eskalirani ticketi"
@@ -8805,7 +8814,7 @@ msgstr "Prvi koraci"
 msgid "First article (oldest)"
 msgstr "Prvi članak"
 
-#: app/assets/javascripts/app/models/user.coffee:9
+#: app/assets/javascripts/app/models/user.coffee:18
 #: app/frontend/apps/desktop/composables/authentication/useSignupForm.ts:14
 #: db/seeds/object_manager_attributes.rb:818
 msgid "First name"
@@ -9122,7 +9131,7 @@ msgstr "Gateway"
 msgid "General communication error, maybe internet is not available!"
 msgstr "Opća greška u komunikaciji, možda internet nije dostupan!"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:126
+#: app/models/ai/agent/type/ticket_tagger.rb:131
 msgid "General tagging principles"
 msgstr ""
 
@@ -9394,9 +9403,7 @@ msgstr "Pozdrav"
 #: app/graphql/gql/types/overview_type.rb:95
 #: app/views/mailer/ticket_create/fr.html.erb:8
 #: app/views/mailer/ticket_create/zh-cn.html.erb:8
-#: app/views/messaging/ticket_create/pt-br.md.erb:3
 #: app/views/messaging/ticket_create/zh-tw.md.erb:3
-#: app/views/messaging/ticket_info/pt-br.md.erb:3
 #: app/views/messaging/ticket_info/zh-tw.md.erb:3
 #: db/seeds/object_manager_attributes.rb:168 db/seeds/settings.rb:2989
 #: lib/excel_sheet/ticket.rb:27
@@ -9444,7 +9451,7 @@ msgid "Group needed in channel definition!"
 msgstr "Potrebna je grupa u definiciji kanala!"
 
 #: app/assets/javascripts/app/models/role.coffee:8
-#: app/assets/javascripts/app/models/user.coffee:13
+#: app/assets/javascripts/app/models/user.coffee:22
 #: db/seeds/object_manager_attributes.rb:1661
 msgid "Group permissions"
 msgstr "Grupne ovlasti"
@@ -11189,7 +11196,7 @@ msgstr ""
 msgid "Last login"
 msgstr "Zadnja prijava"
 
-#: app/assets/javascripts/app/models/user.coffee:10
+#: app/assets/javascripts/app/models/user.coffee:19
 #: app/frontend/apps/desktop/composables/authentication/useSignupForm.ts:23
 #: db/seeds/object_manager_attributes.rb:871
 msgid "Last name"
@@ -11540,7 +11547,7 @@ msgstr "Lokacija eksterne chat.css datoteke."
 msgid "Log in to %s"
 msgstr "Prijavi se na %s"
 
-#: app/assets/javascripts/app/models/user.coffee:8
+#: app/assets/javascripts/app/models/user.coffee:17
 #: app/assets/javascripts/app/views/maintenance.jst.eco:25
 #: app/controllers/time_accountings_controller.rb:101
 #: db/seeds/object_manager_attributes.rb:785
@@ -11722,7 +11729,7 @@ msgstr "Upravljanje oznakama"
 msgid "Manage Telegram channel of your system."
 msgstr "Upravljajte Telegram kanalom Vašeg sustava."
 
-#: app/assets/javascripts/app/controllers/user.coffee:86
+#: app/assets/javascripts/app/controllers/user.coffee:87
 #: app/assets/javascripts/app/controllers/user/manage_two_factor.coffee:4
 msgid "Manage Two-Factor Authentication"
 msgstr "Postavi dvofaktorsku autentifikaciju"
@@ -12118,7 +12125,7 @@ msgstr "Svi"
 msgid "Maybe later"
 msgstr "Možda kasnije"
 
-#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:80
+#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:81
 msgid "Me"
 msgstr "Ja"
 
@@ -12857,7 +12864,7 @@ msgstr "Novi osobni pristupni token"
 msgid "New tab"
 msgstr "Nova kartica"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:145
+#: app/models/ai/agent/type/ticket_tagger.rb:150
 #, fuzzy
 #| msgid "New Category"
 msgid "New tags strategy"
@@ -13594,13 +13601,13 @@ msgstr "Studeni"
 msgid "Number"
 msgstr "Broj"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:174
+#: app/models/ai/agent/type/ticket_tagger.rb:180
 #, fuzzy
 #| msgid "Number"
 msgid "Number of tags"
 msgstr "Broj"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:178
+#: app/models/ai/agent/type/ticket_tagger.rb:184
 msgid "Number of tags the AI agent may assign."
 msgstr ""
 
@@ -14022,7 +14029,7 @@ msgstr "Poredak pregleda ticketa"
 #: app/assets/javascripts/app/controllers/ticket_zoom/sidebar_organization.coffee:20
 #: app/assets/javascripts/app/models/job.coffee:8
 #: app/assets/javascripts/app/models/ticket.coffee:9
-#: app/assets/javascripts/app/models/user.coffee:12
+#: app/assets/javascripts/app/models/user.coffee:21
 #: app/assets/javascripts/app/views/agent_ticket_view/detail.jst.eco:45
 #: app/assets/javascripts/app/views/getting_started/base.jst.eco:5
 #: app/assets/javascripts/app/views/time_accounting/accounted_time.jst.eco:25
@@ -14274,9 +14281,7 @@ msgstr "Preinači skicu"
 #: app/graphql/gql/types/overview_type.rb:96
 #: app/views/mailer/ticket_create/fr.html.erb:9
 #: app/views/mailer/ticket_create/zh-cn.html.erb:9
-#: app/views/messaging/ticket_create/pt-br.md.erb:4
 #: app/views/messaging/ticket_create/zh-tw.md.erb:4
-#: app/views/messaging/ticket_info/pt-br.md.erb:4
 #: app/views/messaging/ticket_info/zh-tw.md.erb:4
 #: db/seeds/object_manager_attributes.rb:214 lib/excel_sheet/ticket.rb:28
 msgid "Owner"
@@ -14999,7 +15004,7 @@ msgstr "Simbol prioriteta"
 msgid "Priority rules"
 msgstr "Prioritet"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:135
+#: app/models/ai/agent/type/ticket_tagger.rb:140
 #, fuzzy
 #| msgid "Priority"
 msgid "Priority tagging rules"
@@ -15636,7 +15641,7 @@ msgstr "Promijeni redoslijed"
 msgid "Replace"
 msgstr "Zamjena"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:166
+#: app/models/ai/agent/type/ticket_tagger.rb:171
 #, fuzzy
 #| msgid "Replacement agent"
 msgid "Replace existing tags with"
@@ -16193,7 +16198,7 @@ msgstr "SSL/STARTTLS"
 msgid "SSO"
 msgstr "SSO"
 
-#: app/controllers/sessions_controller.rb:262
+#: app/controllers/sessions_controller.rb:264
 msgid "SSO request from untrusted IP address."
 msgstr ""
 
@@ -16299,7 +16304,7 @@ msgstr "Spremljeni uvjeti"
 #: app/assets/javascripts/app/controllers/_integration/github.coffee:63
 #: app/assets/javascripts/app/controllers/_integration/gitlab.coffee:80
 #: app/assets/javascripts/app/controllers/_integration/idoit.coffee:93
-#: app/assets/javascripts/app/controllers/ticket_zoom.coffee:1209
+#: app/assets/javascripts/app/controllers/ticket_zoom.coffee:1211
 msgid "Saving failed."
 msgstr "Spremanje nije uspjelo."
 
@@ -16724,21 +16729,21 @@ msgid "See HTTPLog for details."
 msgstr "Detalje potražite u HTTPLog."
 
 #: app/assets/javascripts/app/controllers/_ui_element/ticket_duplicate_detection.coffee:71
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:467
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:469
 #: app/assets/javascripts/app/controllers/data_privacy.coffee:111
-#: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:162
-#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:269
+#: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:166
+#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:273
 msgid "See less"
 msgstr "Pokaži manje"
 
 #: app/assets/javascripts/app/controllers/_ui_element/ticket_duplicate_detection.coffee:68
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:463
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:465
 #: app/assets/javascripts/app/controllers/data_privacy.coffee:108
 #: app/assets/javascripts/app/views/data_privacy/tasks.jst.eco:41
 #: app/assets/javascripts/app/views/generic/ticket_duplicate_detection/warning.jst.eco:21
 #: app/assets/javascripts/app/views/ticket_zoom/article_view.jst.eco:134
-#: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:162
-#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:269
+#: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:166
+#: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:273
 msgid "See more"
 msgstr "Pokaži više"
 
@@ -16995,7 +17000,7 @@ msgstr "Pošiljatelj zadnjeg članka"
 msgid "Sending Email Address"
 msgstr "E-mail adresa odgovora"
 
-#: app/models/ticket/article.rb:332
+#: app/models/ticket/article.rb:341
 msgid "Sending an email without a valid recipient is not possible."
 msgstr "Slanje maila bez ispravnog primatelja nije moguće."
 
@@ -17526,7 +17531,7 @@ msgstr "Potpis:"
 msgid "Signature"
 msgstr "Potpis"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:302
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:304
 msgid "Signature verification failed!"
 msgstr "Provjera potpisa nije uspjela!"
 
@@ -17564,7 +17569,6 @@ msgstr "Slični ticketi pronađeni"
 msgid "Simple Line Icons"
 msgstr "Jednostavne ikone"
 
-#: app/assets/javascripts/app/views/settings/storage_provider.jst.eco:22
 #: db/seeds/settings.rb:379
 msgid "Simple Storage (S3)"
 msgstr "Simple Storage (S3)"
@@ -17879,9 +17883,7 @@ msgstr "Pokretanje uvoza…"
 #: app/graphql/gql/types/overview_type.rb:97
 #: app/views/mailer/ticket_create/fr.html.erb:10
 #: app/views/mailer/ticket_create/zh-cn.html.erb:10
-#: app/views/messaging/ticket_create/pt-br.md.erb:5
 #: app/views/messaging/ticket_create/zh-tw.md.erb:5
-#: app/views/messaging/ticket_info/pt-br.md.erb:5
 #: app/views/messaging/ticket_info/zh-tw.md.erb:5
 #: db/seeds/object_manager_attributes.rb:256 lib/excel_sheet/ticket.rb:25
 msgid "State"
@@ -18109,7 +18111,7 @@ msgstr "Glavni dijelovi sažetka"
 msgid "Summary is being generated…"
 msgstr "Sažetak se generira…"
 
-#: app/assets/javascripts/app/models/user.coffee:336
+#: app/assets/javascripts/app/models/user.coffee:345
 msgid "Summer holiday"
 msgstr "Ljetni praznici"
 
@@ -18246,7 +18248,7 @@ msgstr "Oznake"
 msgid "Tag \"%s\" already exists."
 msgstr "Oznaka \"%s\" već postoji."
 
-#: app/models/ai/agent/type/ticket_tagger.rb:160
+#: app/models/ai/agent/type/ticket_tagger.rb:165
 #, fuzzy
 #| msgid "Assignment Timeout"
 msgid "Tag assignment mode"
@@ -19232,7 +19234,7 @@ msgstr "Nije moguće pronaći objekt."
 #: app/assets/javascripts/app/controllers/_settings/form.coffee:91
 #: app/assets/javascripts/app/controllers/object_manager.coffee:331
 #: app/assets/javascripts/app/controllers/ticket_zoom/sidebar_idoit.coffee:142
-#: app/assets/javascripts/app/controllers/user.coffee:235
+#: app/assets/javascripts/app/controllers/user.coffee:236
 msgid "The object could not be updated."
 msgstr "Nije moguće ažurirati objekt."
 
@@ -19282,7 +19284,7 @@ msgid ""
 "The preview cannot be generated. The format is corrupted or not supported."
 msgstr "Pretpregled se ne može generirati. Oblik nije valjan ili nije podržan."
 
-#: app/models/ai/agent/type/ticket_tagger.rb:139
+#: app/models/ai/agent/type/ticket_tagger.rb:144
 msgid ""
 "The priority rules instruct the AI agent on how to add tags for incoming "
 "tickets."
@@ -19567,7 +19569,7 @@ msgstr "Obavezni parametar 'signup' nije pronađen."
 msgid "The required parameter 'ticket_number' is missing."
 msgstr "Obavezni parametar 'ticket_number' nije pronađen."
 
-#: app/models/concerns/perform_changes/action/attribute_updates.rb:148
+#: app/models/concerns/perform_changes/action/attribute_updates.rb:149
 msgid "The required parameter 'user_id' is missing."
 msgstr "Obavezni parametar 'user_id' nije pronađen."
 
@@ -19587,13 +19589,13 @@ msgstr "Nije moguće obraditi odgovor."
 msgid "The retried attachment download failed."
 msgstr "Ponovljeno preuzimanje privitka nije uspjelo."
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:322
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:324
 #: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleSecurityBadge.vue:62
 #: app/frontend/shared/composables/useArticleSecurity.ts:75
 msgid "The retried security process failed!"
 msgstr "Ponovljeni sigurnosni proces nije uspio!"
 
-#: app/models/ai/agent/type/ticket_tagger.rb:130
+#: app/models/ai/agent/type/ticket_tagger.rb:135
 msgid "The rules instruct the AI agent on how tags are used in the system."
 msgstr ""
 
@@ -19611,7 +19613,7 @@ msgid ""
 "additional instructions necessary."
 msgstr ""
 
-#: app/models/ai/agent/type/ticket_tagger.rb:149
+#: app/models/ai/agent/type/ticket_tagger.rb:154
 msgid ""
 "The rules instruct the AI agent on when to generate new tags and when to "
 "prefer tags from existing tags list."
@@ -19688,7 +19690,7 @@ msgstr ""
 "Potpisni dio ovog PGP e-maila nedostaje ili ima pogrešnu vrstu sadržaja "
 "prema RFC 3156."
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:300
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:302
 #: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleSecurityBadge.vue:85
 #: app/frontend/shared/composables/useArticleSecurity.ts:94
 msgid "The signature was successfully verified."
@@ -19841,7 +19843,7 @@ msgid "The two-factor authentication method \"%s\" was removed for this user."
 msgstr ""
 "Dvofaktorska metoda autentifikacije \"%s\" je uklonjena za ovog korisnika."
 
-#: app/controllers/sessions_controller.rb:251
+#: app/controllers/sessions_controller.rb:253
 #: app/graphql/gql/mutations/two_factor_method_initiate_authentication.rb:32
 #: app/services/service/user/two_factor/initiate_method_configuration.rb:6
 #: app/services/service/user/two_factor/verify_method_configuration.rb:15
@@ -19877,7 +19879,7 @@ msgstr "Nije moguće generirati korisnički token."
 msgid "The user's 'preferred_username' could not be extracted from 'id_token'."
 msgstr "Korisnikov 'preferred_username' nije moguće izvući iz 'id_token'."
 
-#: app/controllers/sessions_controller.rb:247
+#: app/controllers/sessions_controller.rb:249
 #: app/graphql/gql/mutations/two_factor_method_initiate_authentication.rb:27
 msgid "The username or password is incorrect."
 msgstr "Korisničko ime ili lozinka nisu točni."
@@ -21645,7 +21647,7 @@ msgstr "Ukupno obračunato vrijeme"
 msgid "Total display of the number of objects in a grouping."
 msgstr "Ukupan prikaz broja objekata u grupiranju."
 
-#: app/models/ai/agent/type/ticket_tagger.rb:165
+#: app/models/ai/agent/type/ticket_tagger.rb:170
 #, fuzzy
 #| msgid "Ticket could not be created."
 msgid "Total shouldn't exceed"
@@ -22030,7 +22032,7 @@ msgstr "Ukloni poveznicu"
 msgid "Unlink object"
 msgstr "Ukloni poveznicu objekta"
 
-#: app/assets/javascripts/app/controllers/user.coffee:109
+#: app/assets/javascripts/app/controllers/user.coffee:110
 msgid "Unlock"
 msgstr "Otključaj"
 
@@ -22255,7 +22257,7 @@ msgstr "Ažurirano u"
 #: app/assets/javascripts/app/models/knowledge_base_answer_translation.coffee:8
 #: app/assets/javascripts/app/models/organization.coffee:11
 #: app/assets/javascripts/app/models/ticket.coffee:30
-#: app/assets/javascripts/app/models/user.coffee:17
+#: app/assets/javascripts/app/models/user.coffee:26
 #: app/frontend/shared/entities/organization/stores/objectAttributes.ts:41
 #: app/frontend/shared/entities/ticket/stores/objectAttributes.ts:120
 #: app/frontend/shared/entities/user/stores/objectAttributes.ts:44
@@ -22277,7 +22279,7 @@ msgstr "Ažurirano u"
 #: app/assets/javascripts/app/models/sla.coffee:12
 #: app/assets/javascripts/app/models/ticket.coffee:29
 #: app/assets/javascripts/app/models/ticket_article.coffee:17
-#: app/assets/javascripts/app/models/user.coffee:16
+#: app/assets/javascripts/app/models/user.coffee:25
 #: app/frontend/shared/entities/organization/stores/objectAttributes.ts:31
 #: app/frontend/shared/entities/ticket/stores/objectAttributes.ts:109
 #: app/frontend/shared/entities/user/stores/objectAttributes.ts:33
@@ -22622,7 +22624,7 @@ msgstr "Korisnik se ne podudara"
 msgid "User Organization Selector - email"
 msgstr "Odabir korisničke organizacije - e-mail"
 
-#: app/models/user/permissions.rb:50
+#: app/models/user/permissions.rb:53
 msgid "User authorization failed."
 msgstr "Autorizacija korisnika nije uspjela."
 
@@ -22686,6 +22688,7 @@ msgstr "Korisnik je neaktivan"
 msgid "User is inactive"
 msgstr "Korisnik je deaktiviran"
 
+#: app/controllers/sessions_controller.rb:165
 #: app/frontend/apps/desktop/components/Search/QuickSearch/entities/User.vue:25
 msgid "User is inactive."
 msgstr "Korisnik je deaktiviran."
@@ -22711,7 +22714,7 @@ msgstr "Korisnički pretinac"
 msgid "User menu"
 msgstr "Korisnički izbornik"
 
-#: app/assets/javascripts/app/controllers/user.coffee:123
+#: app/assets/javascripts/app/controllers/user.coffee:124
 msgid "User successfully unlocked!"
 msgstr "Korisnik je uspješno otključan!"
 
@@ -22719,7 +22722,7 @@ msgstr "Korisnik je uspješno otključan!"
 msgid "User taskbar tabs"
 msgstr "Kartice trake zadataka korisnika"
 
-#: app/assets/javascripts/app/controllers/user.coffee:220
+#: app/assets/javascripts/app/controllers/user.coffee:221
 msgid "User updated successfully."
 msgstr "Korisnik je uspješno ažuriran."
 
@@ -23668,7 +23671,7 @@ msgstr ""
 msgid "You can use the following script to post the data to %s."
 msgstr "Možete koristiti sljedeću skriptu za slanje podataka %s."
 
-#: app/assets/javascripts/app/controllers/user.coffee:150
+#: app/assets/javascripts/app/controllers/user.coffee:151
 msgid ""
 "You cannot view or change the group permissions of an inactive user. "
 "Activate them first to manage their permissions."
@@ -24454,7 +24457,7 @@ msgstr "standard"
 msgid "delete"
 msgstr "obriši"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:172
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:174
 #: app/frontend/shared/entities/ticket/channel/composables/useWhatsapp.ts:18
 msgid "delivered to the customer"
 msgstr "dostavljeno klijentu"
@@ -25303,7 +25306,7 @@ msgstr "dosegnuto"
 msgid "reacted with a %s to message from %s '%s'"
 msgstr "reagira sa %s na poruku od %s '%s'"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:169
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:171
 #: app/frontend/shared/entities/ticket/channel/composables/useWhatsapp.ts:11
 msgid "read by the customer"
 msgstr "pročitano od klijenta"
@@ -25401,7 +25404,7 @@ msgstr "odaberi privitak…"
 msgid "select visible options"
 msgstr "odaberi vidljive opcije"
 
-#: app/assets/javascripts/app/controllers/article_view/item.coffee:175
+#: app/assets/javascripts/app/controllers/article_view/item.coffee:177
 #: app/frontend/shared/entities/ticket/channel/composables/useWhatsapp.ts:22
 msgid "sent to the customer"
 msgstr "poslano klijentu"

@@ -20399,6 +20399,20 @@
               "description": "Updates to organization records",
               "args": [
                 {
+                  "name": "initial",
+                  "description": "Return initial data by subscribing",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Boolean",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": "false"
+                },
+                {
                   "name": "organizationId",
                   "description": "Organization identifier",
                   "type": {
@@ -23256,6 +23270,22 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "bodyRenderingError",
+              "description": "True when the body could not be rendered due to HTML processing issues and contains an untranslated error message.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },

@@ -46,8 +46,8 @@ class App.AdminFolderMenu
         checkbox: true
         bindCheckbox:
           events:
-            change:     => @updateBulkEditButton()
-            select_all: => @updateBulkEditButton()
+            change: => @updateBulkEditButton()
+          select_all: => @updateBulkEditButton()
       }
       config.pageData.tableExtend
     )
@@ -81,6 +81,7 @@ class App.AdminFolderMenu
     new App.AdminBulkEdit(
       genericObject: @targetModel
       ids:           ids
+      container:     @container
       callback:      =>
         @container.find('[name="bulk"]:checked, [name="bulk_all"]:checked').prop('checked', false)
         @updateBulkEditButton()

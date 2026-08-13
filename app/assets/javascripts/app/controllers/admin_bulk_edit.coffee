@@ -30,6 +30,14 @@ class App.AdminBulkEdit extends App.ControllerModal
   items: =>
     _.compact(_.map(@ids, (id) => App[@genericObject].find(id)))
 
+  # Read the params from the modal form directly. The inherited
+  #   App.ControllerModal#formParams() looks up '.modal form', which only matches
+  #   if the modal element has a '.modal' ancestor inside the search scope - and
+  #   silently returns no params otherwise, which would apply empty values to
+  #   every enabled setting.
+  formParams: =>
+    @formParam(@$('form'))
+
   content: ->
     App.view('admin/bulk_edit')(
       count: @ids.length

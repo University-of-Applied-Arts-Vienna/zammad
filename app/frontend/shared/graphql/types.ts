@@ -1034,7 +1034,11 @@ export enum EnumTaskbarApp {
 
 /** All taskbar entity values */
 export enum EnumTaskbarEntity {
-  Search = 'Search'
+  OrganizationProfile = 'OrganizationProfile',
+  Search = 'Search',
+  TicketCreate = 'TicketCreate',
+  TicketZoom = 'TicketZoom',
+  UserProfile = 'UserProfile'
 }
 
 /** All taskbar entity access type values */

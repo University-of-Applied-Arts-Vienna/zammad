@@ -6004,6 +6004,30 @@
           "interfaces": null,
           "enumValues": [
             {
+              "name": "TicketZoom",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TicketCreate",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "OrganizationProfile",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UserProfile",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "Search",
               "description": null,
               "isDeprecated": false,

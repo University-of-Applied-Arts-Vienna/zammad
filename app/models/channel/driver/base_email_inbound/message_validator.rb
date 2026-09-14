@@ -82,7 +82,46 @@ class Channel::Driver::BaseEmailInbound
       ticket = article.ticket
       return false if ticket&.preferences && ticket.preferences[:channel_id].present? && channel.present? && ticket.preferences[:channel_id] != channel[:id]
 
+      return false if different_receiving_group?(ticket, channel)
+
       true
+    end
+
+    private
+
+    # Checks if a known message arrived at a channel which belongs to another group than the
+    # ticket the message is already known from.
+    #
+    # Tickets which were not created by an email channel carry no `preferences[:channel_id]`
+    # (it is only set in `Channel::EmailParser`), so the channel comparison in
+    # `already_imported?` cannot tell an echo of our own mail apart from a mail that another
+    # group legitimately received. Comparing the groups in that case keeps a mail which was
+    # sent from one Zammad group to another one importable for the receiving group.
+    #
+    # This does not cause repeated imports: afterwards the newest article for the message id
+    # belongs to a ticket of the receiving group - either a newly created one, which carries
+    # the receiving `preferences[:channel_id]`, or a follow-up, whose `group_id` matches the
+    # receiving channel. Independently of that the drivers fetch unread messages only and
+    # flag a processed one as read, so even a message which produces no article at all is
+    # only ever fetched once.
+    def different_receiving_group?(ticket, channel)
+      return false if !Setting.get('postmaster_follow_up_new_ticket_for_different_group')
+      return false if ticket.blank? || channel.blank?
+
+      # Already covered by the channel comparison in `already_imported?`.
+      return false if ticket.preferences[:channel_id].present?
+
+      # Channels without a (still existing) group are out of scope: the receiving group would
+      # only be resolvable from the recipient address, which happens later in
+      # `Channel::Filter::IdentifyGroup`. Resolve it the same way
+      # `Channel::Filter::FollowUpGroupCheck` does, so both can never disagree and import a
+      # message which is then threaded onto the foreign group's ticket anyway.
+      return false if channel[:group_id].blank?
+
+      receiving_group = Group.lookup(id: channel[:group_id])
+      return false if receiving_group.blank?
+
+      ticket.group_id != receiving_group.id
     end
   end
 end

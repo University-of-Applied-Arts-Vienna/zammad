@@ -400,8 +400,8 @@ class App.UiElement.ApplicationSelector
         if spacer is groupKey
           attributeConfig = elements[elementKey]
           if attributeConfig.operator
-            displayName = App.i18n.translatePlain(attributeConfig.display)
-            optgroup.append("<option value=\"#{elementKey}\">#{displayName}</option>")
+            label = App.Utils.adminAttributeLabel(App.i18n.translatePlain(attributeConfig.display), attributeConfig.name)
+            optgroup.append("<option value=\"#{elementKey}\">#{label}</option>")
     selection
 
   # disable - if we only have one attribute

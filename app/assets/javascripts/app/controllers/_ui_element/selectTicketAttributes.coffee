@@ -19,7 +19,7 @@ class App.UiElement.selectTicketAttributes extends App.UiElement.ApplicationUiEl
         attributeOptionsArray.push(
           {
             value:  nameTmp
-            name:   row.display
+            name:   App.Utils.adminAttributeLabel(App.i18n.translatePlain(row.display), row.name)
           }
         )
 

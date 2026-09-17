@@ -305,9 +305,9 @@ RSpec.describe 'Manage > Trigger', type: :system do
       end
     end
 
-    it_behaves_like 'adding reached operator to attribute', 'Pending till', 'has reached'
-    it_behaves_like 'adding reached operator to attribute', 'Escalation at', 'has reached'
-    it_behaves_like 'adding reached operator to attribute', 'Escalation at', 'has reached warning'
+    it_behaves_like 'adding reached operator to attribute', 'Pending till (pending_time)', 'has reached'
+    it_behaves_like 'adding reached operator to attribute', 'Escalation at (escalation_at)', 'has reached'
+    it_behaves_like 'adding reached operator to attribute', 'Escalation at (escalation_at)', 'has reached warning'
 
     it "removes 'action' attribute" do
       open_new_trigger_dialog

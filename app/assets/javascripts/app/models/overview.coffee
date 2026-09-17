@@ -110,5 +110,5 @@ You can also create overviews and limit them to specific agents or to groups of 
     for key, attribute of App.Ticket.attributesGet()
       if !key.match(/(_at|_no)$/) && attribute.tag isnt 'datetime' && key isnt 'number' && key isnt 'tags'
         key = key.replace(/_(id|ids)$/, '')
-        groupByAttributes[key] = attribute.display
+        groupByAttributes[key] = App.Utils.adminAttributeLabel(App.i18n.translatePlain(attribute.display), attribute.name)
     groupByAttributes

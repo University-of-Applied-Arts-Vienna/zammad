@@ -1621,6 +1621,16 @@ class App.Utils
 
     return display_name + ' <' + email + '>'
 
+  # Label of an object attribute for the admin interface: the (already translated)
+  #   display name followed by the technical name in brackets, e.g. "State (state_id)".
+  #   Display names are admin-defined and may repeat, while the technical name is what
+  #   identifies the attribute in the object manager, in conditions and in the API.
+  @adminAttributeLabel: (displayName, technicalName) ->
+    return displayName if !technicalName
+    return displayName if displayName is technicalName
+
+    "#{displayName} (#{technicalName})"
+
   # Truncate the passed text to desired length
   @truncate: (input, length = 100) ->
     return input if not input

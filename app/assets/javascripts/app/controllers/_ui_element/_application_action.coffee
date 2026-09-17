@@ -289,12 +289,12 @@ class App.UiElement.ApplicationAction
         elementGroup = @elementKeyGroup(elementKey)
         if elementGroup is groupKey
           attributeConfig = elements[elementKey]
-          displayName = App.i18n.translateInline(attributeConfig.display)
+          label = App.Utils.adminAttributeLabel(App.i18n.translateInline(attributeConfig.display), attributeConfig.name)
 
           selected = ''
           if elementKey is selectedValue
             selected = 'selected="selected"'
-          optgroup.append("<option value=\"#{elementKey}\" #{selected}>#{displayName}</option>")
+          optgroup.append("<option value=\"#{elementKey}\" #{selected}>#{label}</option>")
     selection
 
   # disable - if we only have one attribute

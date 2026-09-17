@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 require_relative 'shared_examples/ping'
+require_relative 'shared_examples/check_temperature_support'
 
 RSpec.describe AI::Provider::Anthropic, integration: true, required_envs: %w[ANTHROPIC_API_KEY], use_vcr: true do
   subject(:ai_provider) { described_class.new(options: { json_response: true }) }
@@ -23,6 +24,7 @@ RSpec.describe AI::Provider::Anthropic, integration: true, required_envs: %w[ANT
   end
 
   include_examples 'provider/ping!'
+  include_examples 'provider/check_temperature_support'
 
   context 'when specifying a model' do
     context 'without a model' do
@@ -67,6 +69,26 @@ RSpec.describe AI::Provider::Anthropic, integration: true, required_envs: %w[ANT
       expect do
         ai_provider.ask(prompt_system:, prompt_user:)
       end.to raise_error(AI::Provider::ResponseError, 'Invalid request - please check your input')
+    end
+  end
+
+  context 'when the response contains thinking blocks' do
+    it 'returns the content of the text block' do
+      allow(UserAgent).to receive(:post).and_return(
+        UserAgent::Result.new(
+          success: true,
+          code:    200,
+          data:    {
+            'content' => [
+              { 'type' => 'thinking', 'thinking' => '', 'signature' => 'Et...' },
+              { 'type' => 'text', 'text' => '{ "connected": "true" }' },
+            ],
+            'usage'   => { 'input_tokens' => 1, 'output_tokens' => 1 },
+          },
+        )
+      )
+
+      expect(ai_provider.ask(prompt_system:, prompt_user:)).to match({ 'connected' => 'true' })
     end
   end
 

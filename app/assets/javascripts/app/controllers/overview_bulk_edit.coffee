@@ -12,7 +12,7 @@ class App.OverviewBulkEdit extends App.ControllerModal
 
   # The settings that can be changed in bulk and which overview attributes each
   #   of them controls.
-  sections: ['roles', 'attributes', 'sorting', 'grouping', 'active']
+  sections: ['folder', 'roles', 'attributes', 'sorting', 'grouping', 'active']
 
   events:
     'submit form':                        'submit'
@@ -38,6 +38,12 @@ class App.OverviewBulkEdit extends App.ControllerModal
   post: =>
     attributes = App.Overview.attributesGet('edit')
 
+    folderAttribute         = attributes['folder_id']
+    folderAttribute.display = __('Move to the following folder')
+
+    # Show the full path, so nested folders sharing a name stay distinguishable.
+    folderAttribute.display_full_name = true
+
     rolesAttribute = attributes['role_ids']
     rolesAttribute.display = __('Add the following roles')
     rolesAttribute.null    = true
@@ -57,12 +63,14 @@ class App.OverviewBulkEdit extends App.ControllerModal
         false: __('inactive')
 
     @sectionForms =
+      folder:     @renderSectionForm('folder',     [folderAttribute])
       roles:      @renderSectionForm('roles',      [rolesAttribute])
       attributes: @renderSectionForm('attributes', [attributes['view::s']])
       sorting:    @renderSectionForm('sorting',    [attributes['order::by'], attributes['order::direction']])
       grouping:   @renderSectionForm('grouping',   [groupByAttribute, attributes['group_direction']])
       active:     @renderSectionForm('active',     [activeAttribute])
 
+    @renderCurrentFolders()
     @renderCurrentRoles()
 
   renderSectionForm: (section, sectionAttributes) =>
@@ -76,6 +84,26 @@ class App.OverviewBulkEdit extends App.ControllerModal
 
   sectionElement: (section) =>
     @$(".overview-bulk-section[data-section=\"#{section}\"]")
+
+  # All folders offered by the folder select.
+  folders: =>
+    _.filter(App.OverviewFolder.all(), (folder) -> folder?.active)
+
+  # Show the admin in which folders the selected overviews currently are, so it
+  #   is clear which assignments the move is going to replace.
+  renderCurrentFolders: =>
+    total  = @overviewIds.length
+    counts = {}
+    for overview in @overviews()
+      folderId         = overview.folder_id || ''
+      counts[folderId] = (counts[folderId] || 0) + 1
+
+    parts = for folderId, count of counts
+      name = if folderId && App.OverviewFolder.exists(folderId) then App.OverviewFolder.find(folderId).displayName() else App.i18n.translateInline('no folder')
+      "#{name} (#{count}/#{total})"
+
+    text = App.i18n.translateContent('The selected overviews are currently located in: %s', parts.join(', '))
+    @sectionElement('folder').find('.js-folders-current').text(text)
 
   # Show the admin which roles the selected overviews currently have, so it is
   #   clear that adding roles keeps the existing ones (and that the selection
@@ -117,6 +145,10 @@ class App.OverviewBulkEdit extends App.ControllerModal
 
     params = @formParams()
 
+    if 'folder' in enabled && !params.folder_id && _.isEmpty(@folders())
+      @showAlert(__('No folders are available yet. Please create a folder first.'))
+      return
+
     if 'roles' in enabled && _.isEmpty(params.role_ids)
       @showAlert(__('Please select at least one role to add.'))
       return
@@ -152,6 +184,9 @@ class App.OverviewBulkEdit extends App.ControllerModal
 
   applyToOverview: (overview, enabled, params, errors, finish) =>
     update = {}
+
+    if 'folder' in enabled
+      update.folder_id = if params.folder_id then parseInt(params.folder_id, 10) else null
 
     if 'roles' in enabled
       addRoleIds       = _.map(params.role_ids, (id) -> parseInt(id, 10))

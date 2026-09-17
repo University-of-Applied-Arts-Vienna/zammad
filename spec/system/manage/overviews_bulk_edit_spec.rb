@@ -14,6 +14,9 @@ RSpec.describe 'Manage > Overviews > Bulk edit', type: :system do
     create(:overview, name: 'Bulk Overview Two', role_ids: [agent_role.id], active: true)
   end
 
+  let!(:folder) { create(:overview_folder, name: 'Bulk Folder') }
+  let!(:nested) { create(:overview_folder, name: 'Nested Folder', parent: folder) }
+
   def select_overview(overview)
     find("tr[data-id='#{overview.id}'] td.table-checkbox").check('bulk', allow_label_click: true)
   end
@@ -39,9 +42,9 @@ RSpec.describe 'Manage > Overviews > Bulk edit', type: :system do
     find('[data-type=bulk-edit]').click
 
     in_modal do
-      expect(page).to have_text('The selected overviews currently use these roles')
-
       check 'change_roles', allow_label_click: true
+
+      expect(page).to have_text('The selected overviews currently use these roles')
 
       find("div[data-attribute-name='role_ids'] div.js-pool div[data-value='#{admin_role.id}']").click
 
@@ -72,6 +75,77 @@ RSpec.describe 'Manage > Overviews > Bulk edit', type: :system do
 
     expect(overview_one.reload).to have_attributes(active: false, view: original_view)
     expect(overview_two.reload).to have_attributes(active: false)
+  end
+
+  it 'moves the selected overviews into a folder' do
+    select_overview(overview_one)
+    select_overview(overview_two)
+
+    find('[data-type=bulk-edit]').click
+
+    in_modal do
+      check 'change_folder', allow_label_click: true
+
+      expect(page).to have_text('The selected overviews are currently located in: no folder (2/2)')
+
+      within('.overview-bulk-section[data-section="folder"]') do
+        expect(page).to have_select('folder_id', with_options: ['Bulk Folder', 'Bulk Folder / Nested Folder'])
+
+        select 'Bulk Folder / Nested Folder', from: 'folder_id'
+      end
+
+      click_on 'Apply changes'
+    end
+
+    expect(overview_one.reload.folder).to eq(nested)
+    expect(overview_two.reload.folder).to eq(nested)
+  end
+
+  context 'when the selected overviews are already in a folder' do
+    let!(:overview_one) do
+      create(:overview, name: 'Bulk Overview One', role_ids: [agent_role.id], folder: folder)
+    end
+
+    let!(:overview_two) do
+      create(:overview, name: 'Bulk Overview Two', role_ids: [agent_role.id], folder: folder)
+    end
+
+    it 'moves them out of the folder to the top level' do
+      select_overview(overview_one)
+      select_overview(overview_two)
+
+      find('[data-type=bulk-edit]').click
+
+      in_modal do
+        check 'change_folder', allow_label_click: true
+
+        expect(page).to have_text('The selected overviews are currently located in: Bulk Folder (2/2)')
+
+        click_on 'Apply changes'
+      end
+
+      expect(overview_one.reload.folder_id).to be_nil
+      expect(overview_two.reload.folder_id).to be_nil
+    end
+  end
+
+  context 'without any folder' do
+    let!(:folder) { nil }
+    let!(:nested) { nil }
+
+    it 'refuses to apply an empty folder selection instead of silently clearing it' do
+      select_overview(overview_one)
+
+      find('[data-type=bulk-edit]').click
+
+      in_modal disappears: false do
+        check 'change_folder', allow_label_click: true
+
+        click_on 'Apply changes'
+
+        expect(page).to have_css('.modal-alerts-container', text: 'No folders are available yet.')
+      end
+    end
   end
 
   it 'does not change anything when no setting is enabled' do

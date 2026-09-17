@@ -4,7 +4,7 @@ class App.TextModule extends App.Model
   @url: @apiPath + '/text_modules'
   @configure_attributes = [
     { name: 'name',       display: __('Name'),     tag: 'input',     type: 'text', limit: 100,  null: false },
-    { name: 'admin_folder_id', display: __('Folder'), tag: 'select', multiple: false, null: true, relation: 'AdminFolder', nulloption: true, filter: App.AdminFolder.filterForTargetModel('TextModule') },
+    { name: 'admin_folder_id', display: __('Folder'), tag: 'select', multiple: false, null: true, relation: 'AdminFolder', display_full_name: true, nulloption: true, filter: App.AdminFolder.filterForTargetModel('TextModule') },
     { name: 'keywords',   display: __('Keywords'), tag: 'input',     type: 'text', limit: 100,  null: true },
     { name: 'content',    display: __('Content'),  tag: 'richtext',                limit: 2000, null: false, plugins: [
       {

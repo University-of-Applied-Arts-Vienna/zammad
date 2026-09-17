@@ -23,7 +23,7 @@ class App.AdminFolder extends App.Model
 
   @configure_attributes = [
     { name: 'name',          display: __('Name'),          tag: 'input',   type: 'text', translate: true, limit: 100, 'null': false },
-    { name: 'parent_id',     display: __('Parent folder'), tag: 'select',  multiple: false, null: true, relation: 'AdminFolder', nulloption: true, filter: @filterByTargetModel },
+    { name: 'parent_id',     display: __('Parent folder'), tag: 'select',  multiple: false, null: true, relation: 'AdminFolder', display_full_name: true, nulloption: true, filter: @filterByTargetModel },
     { name: 'active',        display: __('Active'),        tag: 'active',  default: true },
     { name: 'prio',          display: __('Position'),      tag: 'integer', type: 'number', limit: 100, null: true },
     { name: 'created_by_id', display: __('Created by'),     relation: 'User', readonly: 1 },

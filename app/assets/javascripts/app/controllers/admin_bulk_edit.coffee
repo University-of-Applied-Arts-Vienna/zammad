@@ -45,14 +45,16 @@ class App.AdminBulkEdit extends App.ControllerModal
 
   post: =>
     folderAttribute =
-      name:       'admin_folder_id'
-      display:    __('Folder')
-      tag:        'select'
-      multiple:   false
-      null:       true
-      nulloption: true
-      relation:   'AdminFolder'
-      filter:     App.AdminFolder.filterForTargetModel(@genericObject)
+      name:              'admin_folder_id'
+      display:           __('Move to the following folder')
+      tag:               'select'
+      multiple:          false
+      null:              true
+      nulloption:        true
+      relation:          'AdminFolder'
+      # Show the full path, so nested folders sharing a name stay distinguishable.
+      display_full_name: true
+      filter:            App.AdminFolder.filterForTargetModel(@genericObject)
 
     activeAttribute =
       name:      'active'
@@ -69,6 +71,8 @@ class App.AdminBulkEdit extends App.ControllerModal
       folder: @renderSectionForm('folder', [folderAttribute])
       active: @renderSectionForm('active', [activeAttribute])
 
+    @renderCurrentFolders()
+
   renderSectionForm: (section, sectionAttributes) =>
     form = new App.ControllerForm(
       model:           { className: @genericObject }
@@ -80,6 +84,26 @@ class App.AdminBulkEdit extends App.ControllerModal
 
   sectionElement: (section) =>
     @$(".overview-bulk-section[data-section=\"#{section}\"]")
+
+  # All folders of the edited object type, as offered by the folder select.
+  folders: =>
+    _.filter(App.AdminFolder.all(), (folder) => folder?.target_model is @genericObject && folder.active)
+
+  # Show the admin in which folders the selected items currently are, so it is
+  #   clear which assignments the move is going to replace.
+  renderCurrentFolders: =>
+    total  = @ids.length
+    counts = {}
+    for item in @items()
+      folderId         = item.admin_folder_id || ''
+      counts[folderId] = (counts[folderId] || 0) + 1
+
+    parts = for folderId, count of counts
+      name = if folderId && App.AdminFolder.exists(folderId) then App.AdminFolder.find(folderId).displayName() else App.i18n.translateInline('no folder')
+      "#{name} (#{count}/#{total})"
+
+    text = App.i18n.translateContent('The selected items are currently located in: %s', parts.join(', '))
+    @sectionElement('folder').find('.js-folders-current').text(text)
 
   toggleSection: (e) =>
     section = $(e.currentTarget).attr('data-section')
@@ -100,6 +124,10 @@ class App.AdminBulkEdit extends App.ControllerModal
       return
 
     params = @formParams()
+
+    if 'folder' in enabled && !params.admin_folder_id && _.isEmpty(@folders())
+      @showAlert(__('No folders are available yet. Please create a folder first.'))
+      return
 
     @$('.js-submit').addClass('is-disabled')
 

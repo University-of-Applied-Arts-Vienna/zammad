@@ -5,7 +5,7 @@ class App.Overview extends App.Model
   @configure_attributes = [
     { name: 'name',       display: __('Name'),                tag: 'input',    type: 'text', translate: true, limit: 100, 'null': false },
     { name: 'link',       display: __('Link'),                readonly: 1 },
-    { name: 'folder_id',  display: __('Folder'),              tag: 'select', multiple: false, null: true, relation: 'OverviewFolder', nulloption: true },
+    { name: 'folder_id',  display: __('Folder'),              tag: 'select', multiple: false, null: true, relation: 'OverviewFolder', display_full_name: true, nulloption: true },
     { name: 'role_ids',   display: __('Available for the following roles'),    tag: 'column_select', multiple: true, null: false, relation: 'Role', translate: true },
     { name: 'user_ids',   display: __('Restrict to only the following users'), tag: 'column_select', multiple: true, null: true,  relation: 'User', sortBy: 'firstname' },
     { name: 'organization_shared', display: __('Only available for users with shared organizations'), tag: 'select', options: { true: 'yes', false: 'no' }, translate: true, default: false, null: true },

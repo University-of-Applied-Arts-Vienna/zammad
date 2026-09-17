@@ -7,6 +7,8 @@
   </label>
   <div class="overview-bulk-section-body">
     <div class="js-form"></div>
+    <p class="help-text"><%- @T('Select the empty entry (-) to move the items out of their folders to the top level.') %></p>
+    <p class="help-text js-folders-current"></p>
   </div>
 </fieldset>
 

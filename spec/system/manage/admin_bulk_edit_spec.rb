@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Manage > Trigger > Bulk edit', type: :system do
-  let!(:folder) { create(:admin_folder, target_model: 'Trigger', name: 'Sales') }
+  let!(:folder)       { create(:admin_folder, target_model: 'Trigger', name: 'Sales') }
+  let!(:other_folder) { create(:admin_folder, target_model: 'Trigger', name: 'Support') }
+  let!(:nested)       { create(:admin_folder, target_model: 'Trigger', name: 'Escalations', parent: folder) }
 
   # Overridden by the examples which need the triggers to start out in a folder.
   let(:initial_folder) { nil }
@@ -29,7 +31,7 @@ RSpec.describe 'Manage > Trigger > Bulk edit', type: :system do
     expect(page).to have_css('[data-type=admin-bulk-edit]:not(.is-disabled)', text: 'Edit selected (2)')
   end
 
-  it 'moves the selected triggers into a folder' do
+  def bulk_move_to(label)
     select_trigger(trigger_one)
     select_trigger(trigger_two)
 
@@ -39,18 +41,68 @@ RSpec.describe 'Manage > Trigger > Bulk edit', type: :system do
       check 'change_folder', allow_label_click: true
 
       within('.overview-bulk-section[data-section="folder"]') do
-        select 'Sales', from: 'admin_folder_id'
+        select label, from: 'admin_folder_id'
       end
 
       click_on 'Apply changes'
     end
+  end
+
+  it 'moves the selected triggers into a folder' do
+    bulk_move_to('Sales')
 
     expect(trigger_one.reload).to have_attributes(admin_folder_id: folder.id, active: true)
     expect(trigger_two.reload).to have_attributes(admin_folder_id: folder.id, active: true)
   end
 
+  it 'offers nested folders with their full path' do
+    select_trigger(trigger_one)
+
+    find('[data-type=admin-bulk-edit]').click
+
+    in_modal disappears: false do
+      check 'change_folder', allow_label_click: true
+
+      within('.overview-bulk-section[data-section="folder"]') do
+        expect(page).to have_select('admin_folder_id', with_options: ['Sales', 'Sales / Escalations', 'Support'])
+      end
+    end
+  end
+
+  it 'moves the selected triggers into a nested folder' do
+    bulk_move_to('Sales / Escalations')
+
+    expect(trigger_one.reload.admin_folder_id).to eq(nested.id)
+    expect(trigger_two.reload.admin_folder_id).to eq(nested.id)
+  end
+
   context 'when the selected triggers are already in a folder' do
     let(:initial_folder) { folder }
+
+    it 'moves them into a different folder' do
+      bulk_move_to('Support')
+
+      expect(trigger_one.reload.admin_folder_id).to eq(other_folder.id)
+      expect(trigger_two.reload.admin_folder_id).to eq(other_folder.id)
+    end
+
+    it 'moves them out to the top level' do
+      select_trigger(trigger_one)
+      select_trigger(trigger_two)
+
+      find('[data-type=admin-bulk-edit]').click
+
+      in_modal do
+        check 'change_folder', allow_label_click: true
+
+        expect(page).to have_text('The selected items are currently located in: Sales (2/2)')
+
+        click_on 'Apply changes'
+      end
+
+      expect(trigger_one.reload.admin_folder_id).to be_nil
+      expect(trigger_two.reload.admin_folder_id).to be_nil
+    end
 
     it 'changes the active state of the selected triggers without touching their folder' do
       select_trigger(trigger_one)

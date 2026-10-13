@@ -8,6 +8,7 @@
 # share the same message id, which identifies the origin ticket.
 #
 # - the two tickets get linked, so agents of both groups see the relation
+# - the origin ticket gets an internal note that the request opened a ticket
 # - public notes on the receiving group's ticket are copied as internal notes into the
 #   origin ticket, which gets reopened like on a follow-up
 #
@@ -69,7 +70,8 @@ class Transaction::InterGroupNoteCopy
     return if @item[:type] != 'create' && !copyable_article?
     return if !origin_ticket
 
-    link_tickets
+    linked = link_tickets
+    add_ticket_created_note if linked && @item[:type] == 'create'
 
     return if !copyable_article?
 
@@ -116,7 +118,7 @@ class Transaction::InterGroupNoteCopy
     linked = Link.list(link_object: 'Ticket', link_object_value: ticket.id).any? do |link|
       link['link_object'] == 'Ticket' && link['link_object_value'] == origin_ticket.id
     end
-    return if linked
+    return false if linked
 
     Link.add(
       link_type:                'normal',
@@ -151,6 +153,33 @@ class Transaction::InterGroupNoteCopy
     article.clone_attachments(copy.class.name, copy.id)
 
     copy
+  end
+
+  # Confirms in the origin ticket that the request opened a ticket in the receiving group,
+  # in the system language, as the agents there might not have access to it.
+  def add_ticket_created_note
+    created = Translation.translate(Setting.get('locale_default') || 'en-us', 'Ticket %s created!', ticket.number)
+
+    UserInfo.with_user_id(1) do
+      Transaction.execute do
+        Ticket::Article.create!(
+          ticket_id:     origin_ticket.id,
+          type:          Ticket::Article::Type.lookup(name: 'note'),
+          sender:        Ticket::Article::Sender.lookup(name: 'System'),
+          internal:      true,
+          content_type:  'text/html',
+          body:          "<p>✓ #{ERB::Util.html_escape(ticket.group.fullname)}: #{ERB::Util.html_escape(created)}</p>",
+          preferences:   {
+            inter_group_ticket_created: {
+              ticket_id: ticket.id,
+              group_id:  ticket.group_id,
+            },
+          },
+          created_by_id: 1,
+          updated_by_id: 1,
+        )
+      end
+    end
   end
 
   # Prefix the copy with where it comes from, as the agents of the origin ticket might not

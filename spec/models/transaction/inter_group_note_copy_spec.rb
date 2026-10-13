@@ -186,17 +186,53 @@ RSpec.describe Transaction::InterGroupNoteCopy, type: :model do
       expect { perform(item) }.to change(Link, :count).by(1)
     end
 
-    it 'does not copy the imported article' do
+    it 'confirms the created ticket with an internal note in the origin ticket' do
+      perform(item)
+
+      expect(origin_ticket.articles.reload.last).to have_attributes(
+        body:        "<p>✓ #{requested_group.fullname}: Ticket #{ticket.number} created!</p>",
+        internal:    true,
+        type:        Ticket::Article::Type.lookup(name: 'note'),
+        sender:      Ticket::Article::Sender.lookup(name: 'System'),
+        preferences: include(inter_group_ticket_created: include(ticket_id: ticket.id)),
+      )
+    end
+
+    it 'does not change the state of the origin ticket' do
+      expect { perform(item) }.not_to change { origin_ticket.reload.state.name }
+    end
+
+    it 'confirms the created ticket in the system language' do
+      Setting.set('locale_default', 'de-de')
+
+      perform(item)
+
+      expect(origin_ticket.articles.reload.last.body).to include("Ticket #{ticket.number} erstellt!")
+    end
+
+    it 'confirms the created ticket only once' do
+      perform(item)
+
       expect { perform(item) }.not_to change { origin_ticket.articles.reload.count }
+    end
+
+    it 'does not copy the imported article' do
+      perform(item)
+
+      expect(copies).to be_empty
     end
   end
 
   context 'when running through the transaction dispatcher', performs_jobs: true do
-    it 'copies the note' do
+    it 'confirms the created ticket and copies the note' do
       note
       TransactionDispatcher.commit
+      perform_enqueued_jobs(only: TransactionJob)
 
-      expect { perform_enqueued_jobs(only: TransactionJob) }.to change { origin_ticket.articles.reload.count }.by(1)
+      expect(origin_ticket.articles.reload.map(&:preferences)).to include(
+        include(:inter_group_ticket_created),
+        include(:inter_group_note_copy),
+      )
     end
   end
 end

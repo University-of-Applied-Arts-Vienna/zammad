@@ -2,6 +2,7 @@
 
 class Sla < ApplicationModel
   include ChecksClientNotification
+  include HasAuditLogs
   include ChecksConditionValidation
   include HasEscalationCalculationImpact
   include Sla::Assets
@@ -18,8 +19,8 @@ class Sla < ApplicationModel
 
   validate   :cannot_have_response_and_update
 
-  store      :condition
-  store      :data
+  store :condition
+  store :data
 
   def condition_matches?(ticket)
     query_condition, bind_condition, tables = Ticket.selector2sql(condition)

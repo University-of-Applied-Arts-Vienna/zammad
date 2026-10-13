@@ -2,6 +2,7 @@
 
 class CoreWorkflow < ApplicationModel
   include ChecksClientNotification
+  include HasAuditLogs
   include ChecksCoreWorkflow
   include HasSearchIndexBackend
   include CanSelector
@@ -11,6 +12,8 @@ class CoreWorkflow < ApplicationModel
   include CoreWorkflow::Search
 
   belongs_to :admin_folder, optional: true
+
+  self.audit_log_attributes_ignored = %i[preferences]
 
   core_workflow_screens 'create', 'edit'
   core_workflow_permission 'admin.core_workflow'

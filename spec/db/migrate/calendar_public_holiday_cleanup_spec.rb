@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe CalendarPublicHolidayCleanup, type: :db_migration do
-  let(:ical_url)                            { Rails.root.join('test/data/calendar/calendar_duplicate_check.ics') }
+  let(:ical_url)                            { 'http://test/calendar_duplicate_check.ics' }
   let(:calendar_with_public_holiday)        { create(:calendar, ical_url: ical_url) }
   let(:calendar_without_public_holiday)     { create(:calendar, ical_url: ical_url) }
   let(:calendar_without_ical_url)           { create(:calendar) }
@@ -42,6 +42,8 @@ RSpec.describe CalendarPublicHolidayCleanup, type: :db_migration do
 
   before do
     allow(HostnameSafetyCheck).to receive(:validate!).and_return('1.2.3.4')
+    stub_request(:get, 'http://test/calendar_duplicate_check.ics')
+      .to_return(body: Rails.root.join('test/data/calendar/calendar_duplicate_check.ics').read)
 
     travel_to Time.zone.parse('2017-08-24T01:04:44Z0')
 

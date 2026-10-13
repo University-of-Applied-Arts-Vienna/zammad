@@ -3,10 +3,13 @@
 class AI::Provider::Anthropic < AI::Provider
   include AI::Provider::Concerns::HasConfigurableModel
   include AI::Provider::Concerns::HasModelsWithoutTemperatureFallback
+  include AI::Provider::Concerns::ListsModels
 
   ANTHROPIC_API_BASE_URL = 'https://api.anthropic.com/v1'.freeze
 
-  # default model also in app/assets/javascripts/app/lib/app_post/ai_provider/anthropic.coffee
+  # The model list is paginated; its maximum page size covers the catalogue in one request.
+  MODEL_LIST_PAGE_SIZE = 1000
+
   DEFAULT_OPTIONS = {
     model:                      'claude-sonnet-4-6',
     max_tokens:                 1024,
@@ -19,6 +22,70 @@ class AI::Provider::Anthropic < AI::Provider
       'claude-sonnet-5',
     ],
   }.freeze
+
+  def self.headers(config)
+    {
+      'Anthropic-Version' => '2023-06-01',
+      'X-Api-Key'         => config[:token],
+    }
+  end
+
+  def self.check_temperature_support!(config, related_object: nil)
+    response = UserAgent.post(
+      "#{ANTHROPIC_API_BASE_URL}/messages",
+      {
+        model:       config[:model] || DEFAULT_OPTIONS[:model],
+        max_tokens:  1,
+        messages:    [{ role: 'user', content: 'Hello' }],
+        temperature: DEFAULT_OPTIONS[:temperature],
+        stream:      false,
+      },
+      {
+        **REQUEST_TIMEOUT_OPTIONS,
+        verify_ssl: true,
+        headers:    headers(config),
+        json:       true,
+        log:        log_options(only_on_error: true, related_object:),
+      },
+    )
+
+    evaluate_temperature_probe!(response)
+  rescue CheckTemperatureSupportError
+    raise
+  rescue => e
+    raise CheckTemperatureSupportError, e.message
+  end
+
+  # Anthropic's error body has no param/code fields like OpenAI's, so this matches on the
+  # error type plus the message mentioning temperature instead.
+  def self.temperature_unsupported?(response)
+    data  = JSON.parse(response.body.to_s)
+    error = data.is_a?(Hash) ? data['error'] : nil
+    return false if !error.is_a?(Hash)
+
+    error['type'] == 'invalid_request_error' && error['message'].to_s.downcase.include?('temperature')
+  rescue JSON::ParserError
+    false
+  end
+
+  def self.models(config, related_object: nil)
+    response = model_list_response(
+      "#{ANTHROPIC_API_BASE_URL}/models",
+      params:         { limit: MODEL_LIST_PAGE_SIZE },
+      related_object:,
+      headers:        headers(config),
+    )
+
+    data = validate_response!(response)
+
+    # Anthropic reports a display name per model, which is deliberately ignored: a model has one
+    # name everywhere, and it is the id (see Concerns::ListsModels#model_descriptor).
+    normalize_models(model_list_entries!(data), 'id') do |_entry, id|
+      model_descriptor(id:)
+    end
+  end
+
+  private
 
   def chat(prompt_system:, prompt_user:, prompt_image:)
 
@@ -65,9 +132,7 @@ class AI::Provider::Anthropic < AI::Provider
         verify_ssl: true,
         headers:    headers,
         json:       true,
-        log:        {
-          facility: 'AI::Provider',
-        },
+        log:        log_options,
       },
     )
 
@@ -82,73 +147,6 @@ class AI::Provider::Anthropic < AI::Provider
   def embeddings(input:)
     raise NotImplementedError, 'not implemented yet due to missing API'
   end
-
-  def self.ping!(config)
-    response = UserAgent.get(
-      "#{ANTHROPIC_API_BASE_URL}/models",
-      {},
-      {
-        **REQUEST_TIMEOUT_OPTIONS,
-        verify_ssl: true,
-        headers:    headers(config),
-        json:       true,
-        log:        {
-          facility:          'AI::Provider',
-          log_only_on_error: true,
-        },
-      },
-    )
-
-    validate_response!(response)
-
-    nil
-  end
-
-  def self.check_temperature_support!(config)
-    response = UserAgent.post(
-      "#{ANTHROPIC_API_BASE_URL}/messages",
-      {
-        model:       config[:model] || DEFAULT_OPTIONS[:model],
-        max_tokens:  1,
-        messages:    [{ role: 'user', content: 'Hello' }],
-        temperature: DEFAULT_OPTIONS[:temperature],
-        stream:      false,
-      },
-      {
-        **REQUEST_TIMEOUT_OPTIONS,
-        verify_ssl: true,
-        headers:    headers(config),
-        json:       true,
-        log:        {
-          facility:          'AI::Provider',
-          log_only_on_error: true,
-        },
-      },
-    )
-
-    return true if response.success?
-
-    data  = JSON.parse(response.body.to_s)
-    error = data.is_a?(Hash) ? data['error'] : nil
-    return false if !error.is_a?(Hash)
-
-    # Anthropic's error body has no param/code fields like OpenAI's, so this matches on the
-    # error type plus the message mentioning temperature instead.
-    return false if error['type'] == 'invalid_request_error' && error['message'].to_s.downcase.include?('temperature')
-
-    raise error['message']
-  rescue => e
-    raise CheckTemperatureSupportError, e.message
-  end
-
-  def self.headers(config)
-    {
-      'Anthropic-Version' => '2023-06-01',
-      'X-Api-Key'         => config[:token],
-    }
-  end
-
-  private
 
   def specific_metadata
     {

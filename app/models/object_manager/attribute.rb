@@ -4,7 +4,10 @@ class ObjectManager::Attribute < ApplicationModel
   include HasDefaultModelUserRelations
 
   include ChecksClientNotification
+  include HasAuditLogs
   include CanSeed
+
+  self.audit_log_attributes_ignored = %i[to_create to_migrate to_delete to_config data_option_new position]
 
   DATA_TYPES = %w[
     input
@@ -697,16 +700,12 @@ to send no browser reload event, pass false
             null:  true
           )
         when %r{^(multiselect|multi_tree_select)$}
-          options = {
-            null:  true,
-            array: true,
-          }
-
           ActiveRecord::Migration.change_column(
             model.table_name,
             attribute.name,
             data_type,
-            options,
+            null:  true,
+            array: true
           )
         when 'autocompletion_ajax_external_data_source'
           ActiveRecord::Migration.change_column(
@@ -749,16 +748,12 @@ to send no browser reload event, pass false
           null:  true
         )
       when %r{^(multiselect|multi_tree_select)$}
-        options = {
-          null:  true,
-          array: true,
-        }
-
         ActiveRecord::Migration.add_column(
           model.table_name,
           attribute.name,
           data_type,
-          **options,
+          null:  true,
+          array: true
         )
       when 'autocompletion_ajax_external_data_source'
         ActiveRecord::Migration.add_column(

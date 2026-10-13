@@ -1,6 +1,29 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "0303f30fb66551fa12dfe8bec3bb308ae203ab9e1ba6ef8584f4859a88c780f7",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/knowledge_base/category.rb",
+      "line": 70,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"LOWER(#{preferred_translation_sql(:title, nil)}) ASC, knowledge_base_categories.id ASC\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "KnowledgeBase::Category",
+        "method": null
+      },
+      "user_input": "preferred_translation_sql(:title, nil)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Ordering SQL assembled from constants only: the column is a literal symbol at every call site, quoted with quote_column_name, and the locale ids are bound through sanitize_sql_array in .preferred_translation_sql. The sorting mode selects a branch, it is never interpolated."
+    },
+    {
       "warning_type": "Remote Code Execution",
       "warning_code": 24,
       "fingerprint": "0fcd117fd53301f531142fc075ee8d30219c1239affce9322f9939ac0572ba3b",
@@ -97,21 +120,21 @@
     {
       "warning_type": "Unmaintained Dependency",
       "warning_code": 122,
-      "fingerprint": "21ab0fe00fdd5899ffc405cff75aadb91b805ee996a614f7e27b08a287e9062d",
+      "fingerprint": "98b26f60d776fd41ee6f088c833725145be9aac2d7c5b33780241c273622db42",
       "check_name": "EOLRails",
-      "message": "Support for Rails 8.0.5.1 ends on 2026-10-07",
+      "message": "Support for Rails 8.0.5.1 ends on 2026-11-07",
       "file": "Gemfile.lock",
-      "line": 594,
+      "line": 604,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
       "code": null,
       "render_path": null,
       "location": null,
       "user_input": null,
-      "confidence": "Weak",
+      "confidence": "Medium",
       "cwe_id": [
         1104
       ],
-      "note": ""
+      "note": "Stable stays on Rails 8.0, develop is on Rails 8.1."
     },
     {
       "warning_type": "Redirect",
@@ -135,6 +158,29 @@
         601
       ],
       "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "340c6ea40c9694c0dffe06a63d5ebda106985eebbd1bf5f24ef546c7eb73a0e5",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/knowledge_base/answer.rb",
+      "line": 77,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"GREATEST(#{publication_timestamp_sql(true)}, #{preferred_translation_sql(:edited_at, nil)}) DESC NULLS LAST, knowledge_base_answers.id ASC\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "KnowledgeBase::Answer",
+        "method": null
+      },
+      "user_input": "publication_timestamp_sql(true)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Ordering SQL assembled from constants only: .publication_timestamp_sql returns one of two hard-coded strings, and .preferred_translation_sql binds the locale ids through sanitize_sql_array. The sorting mode selects a branch, it is never interpolated."
     },
     {
       "warning_type": "Denial of Service",
@@ -342,6 +388,29 @@
       "note": "Setting.where(area: 'Transaction::Backend::Sync').order(:name) returns defined Transaction backend class names"
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "687d16bd4eea300cd239f4d6e9905bac0a8f3494d93b9bc0f6de835cb937286f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/has_recursive_cte_query.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "with_recursive(name.to_sym => ([anchor, recursive])).from(\"#{name} AS #{table_name}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "HasRecursiveCteQuery",
+        "method": "with_recursive_cte"
+      },
+      "user_input": "name",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": "`name` is always the fixed CTE name from #recursive_tree_cte_name ('recursive_tree'), never derived from user/request input."
+    },
+    {
       "warning_type": "Remote Code Execution",
       "warning_code": 24,
       "fingerprint": "7541faf8d3249dc4ac24f9c354024614ae79b0d6cd4c057f034ea88be1154bf7",
@@ -391,11 +460,34 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "fc15ab95fde722292582b08fa6a3a8f858d030496cef1252e8118cd59603ca46",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/knowledge_base/category.rb",
+      "line": 77,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"#{preferred_translation_sql(:edited_at, nil)} DESC NULLS LAST, knowledge_base_categories.id ASC\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "KnowledgeBase::Category",
+        "method": null
+      },
+      "user_input": "preferred_translation_sql(:edited_at, nil)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Ordering SQL assembled from constants only: the column is a literal symbol at every call site, quoted with quote_column_name, and the locale ids are bound through sanitize_sql_array in .preferred_translation_sql. The sorting mode selects a branch, it is never interpolated."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "7f248c60e38d8f73ba5f3ae896d1c9ac18e8f961c4d34a6c308deba5bf51430c",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/concerns/can_search.rb",
-      "line": 310,
+      "line": 311,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"array_position(ARRAY[#{ids.join(\",\")}]::bigint[], id::bigint)\")",
       "render_path": null,
@@ -410,6 +502,29 @@
         89
       ],
       "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "8390ba4d776d9c6adcc963bc54c459c0998ae8af70a446530014ea5566fb61a8",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/knowledge_base/answer.rb",
+      "line": 72,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"LOWER(#{preferred_translation_sql(:title, nil)}) ASC, knowledge_base_answers.id ASC\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "KnowledgeBase::Answer",
+        "method": null
+      },
+      "user_input": "preferred_translation_sql(:title, nil)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Ordering SQL assembled from constants only: the column is a literal symbol at every call site, quoted with quote_column_name, and the locale ids are bound through sanitize_sql_array in .preferred_translation_sql. The sorting mode selects a branch, it is never interpolated."
     },
     {
       "warning_type": "Remote Code Execution",
@@ -433,29 +548,6 @@
         502
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 24,
-      "fingerprint": "8db3b4731daa1ef96c53729b2fca4cc91b47af058564f61cba24833aacaa55ae",
-      "check_name": "UnsafeReflection",
-      "message": "Unsafe reflection method `constantize` called on model attribute",
-      "file": "app/jobs/transaction_job.rb",
-      "line": 25,
-      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
-      "code": "Setting.get(setting.name).constantize",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "TransactionJob",
-        "method": "perform"
-      },
-      "user_input": "Setting.get(setting.name)",
-      "confidence": "Medium",
-      "cwe_id": [
-        470
-      ],
-      "note": "Setting.where(area: 'Transaction::Backend::Async').order(:name) returns defined Transaction  backend class names"
     },
     {
       "warning_type": "SQL Injection",
@@ -511,7 +603,7 @@
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `constantize` called on model attribute",
       "file": "app/models/link/triggers_subscriptions.rb",
-      "line": 20,
+      "line": 24,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Link::Object.find(link_object_id).name.constantize",
       "render_path": null,
@@ -542,7 +634,7 @@
           "type": "controller",
           "class": "KnowledgeBase::Public::AnswersController",
           "method": "show",
-          "line": 11,
+          "line": 19,
           "file": "app/controllers/knowledge_base/public/answers_controller.rb",
           "rendered": {
             "name": "knowledge_base/public/answers/show",
@@ -629,6 +721,29 @@
         295
       ],
       "note": "Only if requester sends `:disable_ssl_verify` param"
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c9dde9cb384e618985afc97454d9fc91acce22023048727db337b2660b9265cc",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/has_recursive_cte_query.rb",
+      "line": 68,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "joins(\"INNER JOIN #{recursive_tree_cte_name} ON #{(\"#{table_name}.id = #{recursive_tree_cte_name}.parent_id\" or \"#{table_name}.parent_id = #{recursive_tree_cte_name}.id\")}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "HasRecursiveCteQuery",
+        "method": "with_recursive_tree_cte"
+      },
+      "user_input": "recursive_tree_cte_name",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "`recursive_tree_cte_name` is a fixed literal ('recursive_tree') and `table_name` is the model's own Rails table name -- neither is ever derived from user/request input."
     },
     {
       "warning_type": "Remote Code Execution",
@@ -773,29 +888,6 @@
     {
       "warning_type": "Remote Code Execution",
       "warning_code": 24,
-      "fingerprint": "fa62d2e232a02c3e0ac7764954b85b5f199f56923dabb11bf2ff246e7cb5295a",
-      "check_name": "UnsafeReflection",
-      "message": "Unsafe reflection method `constantize` called on model attribute",
-      "file": "lib/transaction_dispatcher.rb",
-      "line": 37,
-      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
-      "code": "Setting.get(setting.name).constantize",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "TransactionDispatcher",
-        "method": "self.perform"
-      },
-      "user_input": "Setting.get(setting.name)",
-      "confidence": "Medium",
-      "cwe_id": [
-        470
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 24,
       "fingerprint": "fc299f57cedf226dc79a25c6bca84ceb85d5896a86820648d49c0e59d865575a",
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `constantize` called on model attribute",
@@ -817,5 +909,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "8.0.4"
+  "brakeman_version": "8.0.5"
 }

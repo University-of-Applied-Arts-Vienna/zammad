@@ -349,7 +349,7 @@ RSpec.describe 'Manage > Trigger', type: :system do
     end
 
     it 'shows trigger placeholder in german' do
-      click ".js-tableBody tr.item[data-id='#{Trigger.find_by(name: 'auto reply (on new tickets)').id}']"
+      find(".js-tableBody tr.item[data-id='#{Trigger.find_by(name: 'auto reply (on new tickets)').id}'] td:not(:first-child)", text: 'auto reply (on new tickets)').click
       wait.until do
         collection = page.evaluate_script("$('div[contenteditable]').data().plugin_textmodule.collection")
         collection.present? && collection.any? { |row| row['name'].include?('Letzter Artikel') }
@@ -383,7 +383,7 @@ RSpec.describe 'Manage > Trigger', type: :system do
     end
 
     it 'offers the HTML article placeholders' do
-      click ".js-tableBody tr.item[data-id='#{Trigger.find_by(name: 'auto reply (on new tickets)').id}']"
+      find(".js-tableBody tr.item[data-id='#{Trigger.find_by(name: 'auto reply (on new tickets)').id}'] td:not(:first-child)", text: 'auto reply (on new tickets)').click
 
       # The plain article placeholders are unaffected by the bug, so they signal that
       #   the collection is fully built before the actual assertion runs.

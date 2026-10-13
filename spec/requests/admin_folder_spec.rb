@@ -36,7 +36,9 @@ RSpec.describe 'Admin Folders', type: :request do
       it 'rejects an unsupported target model' do
         post '/api/v1/admin_folders', params: { name: 'Folder', target_model: 'User' }, as: :json
 
-        expect(response).to have_http_status(:unprocessable_content)
+        # The policy only permits the supported target models, so the request is
+        #   refused before the model validation is reached.
+        expect(response).to have_http_status(:forbidden)
       end
 
       it 'creates a nested folder' do

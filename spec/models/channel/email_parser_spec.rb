@@ -1360,6 +1360,24 @@ RSpec.describe Channel::EmailParser, type: :model do
 
           expect(Ticket.last.group).to eq(group_b)
         end
+
+        context 'when the mail answers a mail the receiving group sent from one of its tickets' do
+          let(:origin_ticket) { create(:ticket, group: group_b) }
+
+          # Group B wrote to Group A's address from its ticket, so the mail exists as the
+          # outgoing article of Group B's ticket and as the imported article of Group A's
+          # ticket. Group A then answered from its ticket, back to Group B's address.
+          before do
+            create(:ticket_article, ticket: origin_ticket, message_id: article.message_id, created_at: 1.hour.ago)
+          end
+
+          it 'appends the answer to the ticket the request was sent from' do
+            expect { described_class.new.process({}, raw_mail) }
+              .to change { origin_ticket.articles.reload.length }.by(1)
+              .and not_change(Ticket, :count)
+              .and not_change { ticket.articles.reload.length }
+          end
+        end
       end
 
       context 'when postmaster_follow_up_new_ticket_for_different_group is disabled (default)' do
@@ -1372,7 +1390,7 @@ RSpec.describe Channel::EmailParser, type: :model do
     end
 
     describe 'assigning ticket.customer' do
-      let(:agent) { create(:agent) }
+      let(:agent)    { create(:agent) }
       let(:customer) { create(:customer) }
 
       let(:raw_mail) { <<~RAW.chomp }

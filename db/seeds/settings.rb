@@ -5192,6 +5192,15 @@ Setting.create_if_not_exists(
 )
 Setting.create_if_not_exists(
   title:       __('Defines transaction backend.'),
+  name:        '0110_inter_group_note_copy',
+  area:        'Transaction::Backend::Async',
+  description: __('Defines the transaction backend to copy public notes into the ticket of the group a request was sent from.'),
+  options:     {},
+  state:       'Transaction::InterGroupNoteCopy',
+  frontend:    false
+)
+Setting.create_if_not_exists(
+  title:       __('Defines transaction backend.'),
   name:        '1000_signature_detection',
   area:        'Transaction::Backend::Async',
   description: __('Defines the transaction backend to detect customer signatures in emails.'),

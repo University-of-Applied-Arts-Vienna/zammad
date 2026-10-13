@@ -74,12 +74,29 @@ RSpec.describe Transaction::InterGroupNoteCopy, type: :model do
       perform(item)
 
       expect(copies.first).to have_attributes(
-        body:          'the answer',
+        body:          end_with('the answer'),
         internal:      true,
         type:          Ticket::Article::Type.lookup(name: 'note'),
         created_by_id: agent.id,
         preferences:   include(inter_group_note_copy: include(ticket_id: ticket.id, article_id: note.id)),
       )
+    end
+
+    it 'states where the note comes from' do
+      perform(item)
+
+      expect(copies.first.body).to start_with("↪ #{requested_group.fullname} · #{agent.fullname} · #{Setting.get('ticket_hook')}#{ticket.number}\n\n")
+    end
+
+    context 'with an html note' do
+      let(:requested_group) { create(:group, name: 'Dep <2>') }
+      let(:note)            { create(:ticket_article, :outbound_note, ticket:, content_type: 'text/html', body: '<p>the answer</p>', created_by_id: agent.id) }
+
+      it 'prepends an escaped source line' do
+        perform(item)
+
+        expect(copies.first.body).to start_with("<p><strong>↪ Dep &lt;2&gt; · #{agent.fullname}").and end_with('<p>the answer</p>')
+      end
     end
 
     it 'reopens the origin ticket' do

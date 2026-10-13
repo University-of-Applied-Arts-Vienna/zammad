@@ -135,7 +135,7 @@ class Transaction::InterGroupNoteCopy
       internal:      true,
       subject:       article.subject,
       content_type:  article.content_type,
-      body:          article.body,
+      body:          copy_body,
       origin_by_id:  article.origin_by_id,
       preferences:   {
         inter_group_note_copy: {
@@ -151,6 +151,21 @@ class Transaction::InterGroupNoteCopy
     article.clone_attachments(copy.class.name, copy.id)
 
     copy
+  end
+
+  # Prefix the copy with where it comes from, as the agents of the origin ticket might not
+  # have access to the ticket of the receiving group (and so do not see the link).
+  # Language neutral, as the article body is not translated for its viewers.
+  def copy_body
+    source = [
+      ticket.group.fullname,
+      article.author&.fullname(email_fallback: false),
+      "#{Setting.get('ticket_hook')}#{Setting.get('ticket_hook_divider')}#{ticket.number}",
+    ].compact_blank.join(' · ')
+
+    return "↪ #{source}\n\n#{article.body}" if !article.content_type&.match?(%r{text/html}i)
+
+    "<p><strong>↪ #{ERB::Util.html_escape(source)}</strong></p>#{article.body}"
   end
 
   # Reopen the origin ticket like a follow-up email does, unless it is still new.

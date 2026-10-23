@@ -113,11 +113,13 @@ class EmailReply extends App.Controller
     type               = App.TicketArticleType.find(article.type_id)
     article_created_by = App.User.find(article.created_by_id)
     email_addresses    = App.EmailAddress.all()
+    group              = App.Group.findNative(ticket.group_id)
+    group_email        = App.EmailAddress.findNative(group.email_address_id) if group?.email_address_id
 
     ui.scrollToCompose()
 
     # empty form
-    articleNew = App.Utils.getRecipientArticle(ticket, article, article_created_by, type, email_addresses, all)
+    articleNew = App.Utils.getRecipientArticle(ticket, article, article_created_by, type, email_addresses, all, group_email?.email)
 
     if ui.Config.get('ui_ticket_zoom_article_email_subject')
       if _.isEmpty(article.subject)

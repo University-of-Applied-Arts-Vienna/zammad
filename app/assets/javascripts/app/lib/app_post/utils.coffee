@@ -1340,7 +1340,7 @@ class App.Utils
     contentType = contentType.replace(/^(.+?\/.+?)(\b|\s).+?$/, '$1')
     contentType
 
-  @getRecipientArticle: (ticket, article, article_created_by, type, email_addresses = [], all) ->
+  @getRecipientArticle: (ticket, article, article_created_by, type, email_addresses = [], all, group_email_address) ->
 
     # empty form
     articleNew = {
@@ -1403,8 +1403,21 @@ class App.Utils
             recipientIsLocal = isLocalAddress(localRecipient)
             break if recipientIsLocal is true
 
+      # sender is the address of another group, which emailed the address of the ticket's
+      #   group (a request between groups): answer that group, although it is local
+      foreignGroupAddress = undefined
+      if senderIsLocal && !_.isEmpty(group_email_address)
+        ownAddress = group_email_address.toString().toLowerCase()
+        fromAddresses = _.map(App.Utils.parseAddressListLocal(article.from) || [], (a) -> a.toString().toLowerCase())
+        toAddresses = _.map(App.Utils.parseAddressListLocal(_.compact([article.to, article.cc]).join(', ')) || [], (a) -> a.toString().toLowerCase())
+        if !_.contains(fromAddresses, ownAddress) && _.contains(toAddresses, ownAddress)
+          foreignGroupAddress = _.find(fromAddresses, (a) -> isLocalAddress(a))
+
+      if foreignGroupAddress
+        articleNew.to = article.reply_to || article.from
+
       # sender is local
-      if senderIsLocal
+      else if senderIsLocal
         articleNew.to = article.reply_to || article.to
 
       # sender is agent - sent via system
@@ -1430,7 +1443,7 @@ class App.Utils
 
         recipients = recipients.map((r) -> r.toString().toLowerCase())
         recipients = _.reject(recipients, (r) -> _.isEmpty(r))
-        recipients = _.reject(recipients, (r) -> isLocalAddress(r))
+        recipients = _.reject(recipients, (r) -> isLocalAddress(r) && r isnt foreignGroupAddress)
         recipients = _.reject(recipients, (r) -> recipientAddresses[r])
         recipients = _.each(recipients, (r) -> recipientAddresses[r] = true)
 

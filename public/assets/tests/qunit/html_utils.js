@@ -3512,6 +3512,58 @@ QUnit.test('check getRecipientArticle format', assert => {
   verify = App.Utils.getRecipientArticle(ticket, article, article.created_by, article.type, email_addresses)
   assert.deepEqual(verify, result)
 
+  // If "From:" is the address of another group which emailed the address of the ticket's group, answer it
+
+  article = {
+    type: {
+      name: 'email',
+    },
+    sender: {
+      name: 'Agent',
+    },
+    from: 'Group A <group-a@example.com>',
+    to: 'Group B <group-b@example.com>',
+    cc: 'customer@example.com',
+    message_id: 'message_id23',
+    created_by: {
+      login: 'login',
+      firstname: 'firstname',
+      lastname: 'lastname',
+      email: 'article_created_by@example.com',
+    },
+  }
+  email_addresses = [{ email: 'group-a@example.com' }, { email: 'group-b@example.com' }]
+  result = {
+    to:          'group-a@example.com',
+    cc:          '',
+    body:        '',
+    in_reply_to: 'message_id23',
+  }
+  verify = App.Utils.getRecipientArticle(ticket, article, article.created_by, article.type, email_addresses, false, 'group-b@example.com')
+  assert.deepEqual(verify, result)
+
+  result = {
+    to:          'group-a@example.com',
+    cc:          'customer@example.com',
+    body:        '',
+    in_reply_to: 'message_id23',
+  }
+  verify = App.Utils.getRecipientArticle(ticket, article, article.created_by, article.type, email_addresses, true, 'group-b@example.com')
+  assert.deepEqual(verify, result)
+
+  // ... but not a mail the ticket's group sent to it
+
+  article.from = 'Group B <group-b@example.com>'
+  article.to   = 'Group A <group-a@example.com>'
+  result = {
+    to:          '',
+    cc:          '',
+    body:        '',
+    in_reply_to: 'message_id23',
+  }
+  verify = App.Utils.getRecipientArticle(ticket, article, article.created_by, article.type, email_addresses, false, 'group-b@example.com')
+  assert.deepEqual(verify, result)
+
 });
 
 QUnit.test("contentTypeCleanup", assert => {

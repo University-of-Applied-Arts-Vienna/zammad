@@ -12,17 +12,40 @@ import { getArticleSelection, getReplyQuoteHeader } from './selection.ts'
 
 import type { TicketArticlePerformOptions } from '../types.ts'
 
-const getEmailAddresses = (field?: Maybe<AddressesField>) => {
+const getEmailAddresses = (field?: Maybe<AddressesField>, allowedSystemAddress?: string) => {
   if (!field) return []
   const addresses = field.parsed?.filter(
     (email): email is { emailAddress: string; isSystemAddress: boolean } => !!email.emailAddress,
   )
   if (addresses?.length) {
     return addresses
-      .filter((address) => !address.isSystemAddress)
+      .filter(
+        (address) =>
+          !address.isSystemAddress || address.emailAddress.toLowerCase() === allowedSystemAddress,
+      )
       .map((address) => address.emailAddress)
   }
   return []
+}
+
+// The address of another group, which emailed the address of the ticket's group (a
+//   request between groups). It is answered although it is a system address.
+const getForeignGroupAddress = (ticket: TicketById, article: TicketArticle) => {
+  const ownAddress = ticket.group.emailAddress?.emailAddress?.toLowerCase()
+  if (!ownAddress) return undefined
+
+  const isOwnAddress = (address: { emailAddress?: Maybe<string> }) =>
+    address.emailAddress?.toLowerCase() === ownAddress
+
+  const fromAddresses = article.from?.parsed || []
+  if (fromAddresses.some(isOwnAddress)) return undefined
+
+  const recipientAddresses = [...(article.to?.parsed || []), ...(article.cc?.parsed || [])]
+  if (!recipientAddresses.some(isOwnAddress)) return undefined
+
+  return fromAddresses
+    .find((address) => address.isSystemAddress && address.emailAddress)
+    ?.emailAddress?.toLowerCase()
 }
 
 const getEmptyArticle = (article: TicketArticle) => ({
@@ -83,17 +106,30 @@ const prepareAllEmails = (
   emailsSeen: Set<string>,
   article: TicketArticle,
   newArticle: ReturnType<typeof getEmptyArticle>,
+  foreignGroupAddress?: string,
 ) => {
   if (article.from) {
-    newArticle.to = prepareEmails(emailsSeen, getEmailAddresses(article.from), newArticle.to)
+    newArticle.to = prepareEmails(
+      emailsSeen,
+      getEmailAddresses(article.from, foreignGroupAddress),
+      newArticle.to,
+    )
   }
 
   if (article.to) {
-    newArticle.to = prepareEmails(emailsSeen, getEmailAddresses(article.to), newArticle.to)
+    newArticle.to = prepareEmails(
+      emailsSeen,
+      getEmailAddresses(article.to, foreignGroupAddress),
+      newArticle.to,
+    )
   }
 
   if (article.cc) {
-    newArticle.cc = prepareEmails(emailsSeen, getEmailAddresses(article.cc), newArticle.cc)
+    newArticle.cc = prepareEmails(
+      emailsSeen,
+      getEmailAddresses(article.cc, foreignGroupAddress),
+      newArticle.cc,
+    )
   }
 }
 
@@ -121,7 +157,11 @@ const getRecipientArticle = (ticket: TicketById, article: TicketArticle, all = f
       address.emailAddress?.toLowerCase().includes(senderEmail),
     )
 
-  if (senderIsSystem) {
+  const foreignGroupAddress = senderIsSystem ? getForeignGroupAddress(ticket, article) : undefined
+
+  if (foreignGroupAddress) {
+    newArticle.to = getEmailAddresses(article.replyTo || article.from, foreignGroupAddress)
+  } else if (senderIsSystem) {
     newArticle.to = getEmailAddresses(article.replyTo || article.to)
   }
   // sender is agent - sent via system
@@ -145,7 +185,7 @@ const getRecipientArticle = (ticket: TicketById, article: TicketArticle, all = f
     return newArticle
   }
 
-  prepareAllEmails(emailsSeen, article, newArticle)
+  prepareAllEmails(emailsSeen, article, newArticle, foreignGroupAddress)
 
   return newArticle
 }

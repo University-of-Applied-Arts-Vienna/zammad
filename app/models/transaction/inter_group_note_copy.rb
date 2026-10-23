@@ -54,6 +54,22 @@ class Transaction::InterGroupNoteCopy
       .first
   end
 
+  # Prefixes the body of an article which comes from the given ticket of another group
+  # with where it comes from, as the agents of the receiving ticket might not have access
+  # to that ticket (and so do not see the link).
+  # Language neutral, as the article body is not translated for its viewers.
+  def self.source_body(ticket, author, body, content_type)
+    source = [
+      ticket.group.fullname,
+      author&.fullname(email_fallback: false),
+      "#{Setting.get('ticket_hook')}#{Setting.get('ticket_hook_divider')}#{ticket.number}",
+    ].compact_blank.join(' · ')
+
+    return "↪ #{source}\n\n#{body}" if !content_type&.match?(%r{text/html}i)
+
+    "<p><strong>↪ #{ERB::Util.html_escape(source)}</strong></p>#{body}"
+  end
+
   def initialize(item, params = {})
     @item = item
     @params = params
@@ -182,19 +198,8 @@ class Transaction::InterGroupNoteCopy
     end
   end
 
-  # Prefix the copy with where it comes from, as the agents of the origin ticket might not
-  # have access to the ticket of the receiving group (and so do not see the link).
-  # Language neutral, as the article body is not translated for its viewers.
   def copy_body
-    source = [
-      ticket.group.fullname,
-      article.author&.fullname(email_fallback: false),
-      "#{Setting.get('ticket_hook')}#{Setting.get('ticket_hook_divider')}#{ticket.number}",
-    ].compact_blank.join(' · ')
-
-    return "↪ #{source}\n\n#{article.body}" if !article.content_type&.match?(%r{text/html}i)
-
-    "<p><strong>↪ #{ERB::Util.html_escape(source)}</strong></p>#{article.body}"
+    self.class.source_body(ticket, article.author, article.body, article.content_type)
   end
 
   # Reopen the origin ticket like a follow-up email does, unless it is still new.

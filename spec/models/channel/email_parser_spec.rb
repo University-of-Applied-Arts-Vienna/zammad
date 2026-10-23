@@ -1515,6 +1515,12 @@ RSpec.describe Channel::EmailParser, type: :model do
 
             expect(Ticket.last).to have_attributes(group: group_b, articles: have_attributes(length: 2))
           end
+
+          it 'states in each of them which agent sent it from which ticket' do
+            agents.each { |agent| send_from_ticket(agent) }
+
+            expect(Ticket.last.articles.map(&:body)).to eq(agents.map { |agent| "↪ #{group_a.fullname} · #{agent.fullname} · #{ticket_ref}\n\nLorem ipsum dolor" })
+          end
         end
       end
 

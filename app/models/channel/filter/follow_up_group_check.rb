@@ -21,6 +21,10 @@ module Channel::Filter::FollowUpGroupCheck
   # group, or the other way round: everything sent from one ticket to the other group
   # lands in the same ticket there.
   #
+  # A mail which an agent sent from the detected ticket (it holds the outgoing article)
+  # gets prefixed with the group, the agent and the number of that ticket, like the notes
+  # copied between the tickets (see Transaction::InterGroupNoteCopy).
+  #
   # Runs after the regular follow-up detection (FollowUpCheck/FollowUpPossibleCheck) and
   # before IdentifyGroup, so clearing the follow-up id makes IdentifyGroup fall back to
   # the receiving group.
@@ -40,11 +44,7 @@ module Channel::Filter::FollowUpGroupCheck
     return if receiving_group.blank?
     return if ticket.group_id == receiving_group.id
 
-    # Clean the subject so the new ticket does not carry the foreign ticket hook
-    # (which would otherwise re-thread later replies back to the foreign ticket).
-    mail[:subject]                  = ticket.subject_clean(mail[:subject]) if mail[:subject].present?
-    mail[:'x-zammad-ticket-id']     = nil
-    mail[:'x-zammad-ticket-number'] = nil
+    detach_from_ticket(mail, ticket)
 
     referenced_ticket = referenced_ticket_in_group(mail, receiving_group) || related_ticket_in_group(ticket, receiving_group)
     if referenced_ticket
@@ -56,6 +56,31 @@ module Channel::Filter::FollowUpGroupCheck
     end
 
     true
+  end
+
+  def self.detach_from_ticket(mail, ticket)
+
+    # Clean the subject so the new ticket does not carry the foreign ticket hook
+    # (which would otherwise re-thread later replies back to the foreign ticket).
+    mail[:subject]                  = ticket.subject_clean(mail[:subject]) if mail[:subject].present?
+    mail[:'x-zammad-ticket-id']     = nil
+    mail[:'x-zammad-ticket-number'] = nil
+
+    mark_source_ticket(mail, ticket)
+  end
+
+  def self.mark_source_ticket(mail, ticket)
+    return if mail[:message_id].blank?
+    return if mail[:body].nil?
+
+    source_article = ticket.articles.find_by(
+      message_id_md5: Digest::MD5.hexdigest(mail[:message_id].to_s),
+      sender_id:      Ticket::Article::Sender.lookup(name: 'Agent').id,
+      type_id:        Ticket::Article::Type.lookup(name: 'email').id,
+    )
+    return if !source_article
+
+    mail[:body] = Transaction::InterGroupNoteCopy.source_body(ticket, source_article.author, mail[:body], mail[:content_type])
   end
 
   # Finds the most recent ticket of the receiving group which holds an article for one

@@ -167,6 +167,55 @@ RSpec.describe Channel::Filter::FollowUpGroupCheck, type: :channel_filter do
       end
     end
 
+    context 'when an agent sent the mail from the detected ticket' do
+      let(:agent)      { create(:agent, groups: [group_a]) }
+      let(:message_id) { "<#{SecureRandom.uuid}@zammad.example.com>" }
+      let(:mail_hash) do
+        {
+          'x-zammad-ticket-id': ticket.id,
+          subject:              "[Ticket##{ticket.number}] some subject",
+          message_id:,
+          content_type:         'text/html',
+          body:                 '<p>the answer</p>',
+        }
+      end
+
+      before { create(:ticket_article, :outbound_email, ticket:, message_id:, created_by: agent) }
+
+      it 'states where the mail comes from' do
+        filter(mail_hash, channel:)
+
+        expect(mail_hash[:body]).to eq("<p><strong>↪ #{group_a.fullname} · #{agent.fullname} · #{Setting.get('ticket_hook')}#{ticket.number}</strong></p><p>the answer</p>")
+      end
+
+      context 'with a plain text mail' do
+        before { mail_hash.merge!(content_type: 'text/plain', body: 'the answer') }
+
+        it 'states where the mail comes from' do
+          filter(mail_hash, channel:)
+
+          expect(mail_hash[:body]).to eq("↪ #{group_a.fullname} · #{agent.fullname} · #{Setting.get('ticket_hook')}#{ticket.number}\n\nthe answer")
+        end
+      end
+    end
+
+    context 'when the mail was not sent from the detected ticket' do
+      let(:mail_hash) do
+        {
+          'x-zammad-ticket-id': ticket.id,
+          message_id:           "<#{SecureRandom.uuid}@zammad.example.com>",
+          content_type:         'text/plain',
+          body:                 'the answer',
+        }
+      end
+
+      it 'keeps the body' do
+        filter(mail_hash, channel:)
+
+        expect(mail_hash[:body]).to eq('the answer')
+      end
+    end
+
     context 'when the mail only references tickets of other groups' do
       let(:mail_hash) do
         {

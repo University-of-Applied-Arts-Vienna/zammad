@@ -1877,6 +1877,37 @@ RSpec.describe 'User', performs_jobs: true, type: :request do
     end
   end
 
+  describe 'GET /api/v1/users/online' do
+    let(:admin)     { create(:admin) }
+    let(:agent)     { create(:agent) }
+    let(:client_id) { 'bbbb1' }
+
+    before do
+      Sessions.create(client_id, { 'id' => agent.id }, { type: 'websocket' })
+    end
+
+    after do
+      Sessions.destroy(client_id)
+    end
+
+    context 'with authenticated admin user', authenticated_as: :admin do
+      it 'returns the ids of online users', :aggregate_failures do
+        get '/api/v1/users/online', as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['user_ids']).to include(agent.id)
+      end
+    end
+
+    context 'with authenticated agent user', authenticated_as: :agent do
+      it 'fails without admin permission' do
+        get '/api/v1/users/online', as: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
   describe 'PUT /api/v1/users/unlock/{id}' do
     let(:admin) { create(:admin) }
     let(:agent)    { create(:agent) }

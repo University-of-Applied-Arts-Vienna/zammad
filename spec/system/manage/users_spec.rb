@@ -163,6 +163,34 @@ RSpec.describe 'Manage > Users', type: :system do
     end
   end
 
+  describe 'online status of users', authenticated_as: :authenticate do
+    let(:admin)          { create(:admin) }
+    let(:online_agent)   { create(:agent) }
+    let(:offline_agent)  { create(:agent) }
+    let(:client_id)      { 'cccc1' }
+
+    def authenticate
+      offline_agent
+      Sessions.create(client_id, { 'id' => online_agent.id }, { type: 'websocket' })
+      admin
+    end
+
+    after do
+      Sessions.destroy(client_id)
+    end
+
+    it 'marks online users and counts them' do
+      visit '#manage/users'
+
+      within(:active_content) do
+        expect(page).to have_css('.js-onlineCounter', text: %r{Users online: \d+})
+
+        expect(find("tr[data-id=\"#{online_agent.id}\"]")).to have_css('.user-online-dot.is-online')
+        expect(find("tr[data-id=\"#{offline_agent.id}\"]")).to have_css('.user-online-dot:not(.is-online)')
+      end
+    end
+  end
+
   context 'updating a user' do
     let(:user)   { create(:admin, firstname: 'Dummy') }
     let(:row)    { find "table tbody tr[data-id='#{user.id}']" }

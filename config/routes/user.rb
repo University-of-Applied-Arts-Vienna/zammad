@@ -46,6 +46,7 @@ Zammad::Application.routes.draw do
   match api_path + '/users/avatar/set',            to: 'users#avatar_set_default',    via: :post
 
   match api_path + '/users/me',                    to: 'users#me',                    via: :get
+  match api_path + '/users/online',                to: 'users#online',                via: :get
   match api_path + '/users/after_auth',            to: 'user/after_auth#show',        via: :get
 
   match api_path + '/users',                       to: 'users#index',                 via: :get

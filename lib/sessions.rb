@@ -127,6 +127,28 @@ returns
 
 =begin
 
+list ids of users with a session that pinged within the given time
+
+  user_ids = Sessions.online_user_ids
+
+returns
+
+  [123, 124]
+
+=end
+
+  def self.online_user_ids(idle_time_in_sec = 120)
+    threshold = Time.now.utc.to_i - idle_time_in_sec
+
+    list.filter_map do |_client_id, data|
+      next if data.dig(:meta, :last_ping).to_i < threshold
+
+      data.dig(:user, 'id').presence&.to_i
+    end.uniq
+  end
+
+=begin
+
 destroy session
 
   Sessions.destroy(client_id)

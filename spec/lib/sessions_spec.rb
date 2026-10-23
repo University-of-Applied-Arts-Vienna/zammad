@@ -105,6 +105,36 @@ RSpec.describe Sessions do
     end
   end
 
+  describe '.online_user_ids' do
+    let(:online_agent)  { create(:agent) }
+    let(:idle_agent)    { create(:agent) }
+    let(:client_ids)    { %w[aaaa1 aaaa2 aaaa3 aaaa4] }
+
+    before do
+      travel_to 5.minutes.ago do
+        described_class.create('aaaa1', { 'id' => idle_agent.id }, { type: 'websocket' })
+      end
+      described_class.create('aaaa2', { 'id' => online_agent.id }, { type: 'websocket' })
+      described_class.create('aaaa3', { 'id' => online_agent.id }, { type: 'ajax' })
+      described_class.create('aaaa4', {}, { type: 'websocket' })
+    end
+
+    after do
+      client_ids.each { |client_id| described_class.destroy(client_id) }
+    end
+
+    it 'lists each user with a recent ping once', :aggregate_failures do
+      expect(described_class.online_user_ids.count(online_agent.id)).to eq(1)
+      expect(described_class.online_user_ids).not_to include(idle_agent.id, nil)
+    end
+
+    it 'lists a user again after an idle session pinged' do
+      described_class.touch('aaaa1')
+
+      expect(described_class.online_user_ids).to include(idle_agent.id)
+    end
+  end
+
   describe 'creating and destroying a session for a real user' do
     subject(:client_id) { '123456789' }
 

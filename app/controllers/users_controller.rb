@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   include ChecksUserAttributesByCurrentUserPermission
   include CanPaginate
 
-  prepend_before_action -> { authorize! }, only: %i[import_example import_start search history unlock]
+  prepend_before_action -> { authorize! }, only: %i[import_example import_start search history unlock online]
   prepend_before_action :authentication_check, except: %i[create password_reset_send password_reset_verify image email_verify email_verify_send admin_password_auth_send admin_password_auth_verify]
   prepend_before_action :authentication_check_only, only: %i[create]
 
@@ -260,6 +260,18 @@ class UsersController < ApplicationController
       user.update!(login_failed: 0)
     end
     render json: { message: 'ok' }, status: :ok
+  end
+
+  # @path       [GET] /users/online
+  #
+  # @summary          Returns the ids of users currently online in the classic web app.
+  # @notes            The requester needs 'admin.user' permission. A user counts as online
+  #                   if one of their websocket or long polling sessions pinged in the last two minutes.
+  #
+  # @response_message 200 [Hash] { user_ids: [Integer] }
+  # @response_message 403 Forbidden / Invalid session.
+  def online
+    render json: { user_ids: Sessions.online_user_ids }, status: :ok
   end
 
 =begin

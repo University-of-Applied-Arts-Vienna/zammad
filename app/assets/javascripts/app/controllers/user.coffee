@@ -17,10 +17,16 @@ class User extends App.ControllerSubContent
 
       value
 
+    @onlineUserIds = []
+
+    callbackOnlineAttribute = (value, object) =>
+      @onlineDot(_.contains(@onlineUserIds, object.id)) + value
+
     @genericController = new App.ControllerGenericIndexUser(
       el: @el
       id: @id
       genericObject: 'User'
+      renderCallback: @renderOnlineStatus
       importCallback: ->
         new App.Import(
           baseUrl: '/api/v1/users'
@@ -61,7 +67,7 @@ class User extends App.ControllerSubContent
         ]
         tableExtend: {
           callbackAttributes: {
-            login: [ callbackLoginAttribute ]
+            login: [ callbackLoginAttribute, callbackOnlineAttribute ]
           }
           customActions: [
             {
@@ -134,6 +140,35 @@ class User extends App.ControllerSubContent
           ]
         }
       container: @el.closest('.content')
+    )
+
+    @fetchOnlineUsers()
+    @interval(@fetchOnlineUsers, 30000, 'user_online')
+
+  fetchOnlineUsers: =>
+    @ajax(
+      id:    'user_online'
+      type:  'GET'
+      url:   "#{@apiPath}/users/online"
+      success: (data) =>
+        @onlineUserIds = data.user_ids
+        @renderOnlineStatus()
+    )
+
+  onlineDot: (online) ->
+    label = App.i18n.translateInline(if online then __('Online') else __('Offline'))
+    "<span class=\"user-online-dot js-onlineDot#{if online then ' is-online' else ''}\" role=\"img\" title=\"#{label}\" aria-label=\"#{label}\"></span>"
+
+  renderOnlineStatus: =>
+    counter = @$('.js-onlineCounter')
+    if !counter.length
+      counter = $('<div class="user-online-counter js-onlineCounter"></div>')
+      @$('.page-header-title').append(counter)
+    counter.html(@onlineDot(true) + App.i18n.translateInline('Users online: %s', @onlineUserIds.length))
+
+    @$('.js-onlineDot').closest('tr[data-id]').each((i, row) =>
+      online = _.contains(@onlineUserIds, $(row).data('id'))
+      $(row).find('.js-onlineDot').replaceWith(@onlineDot(online))
     )
 
   show: (params) =>

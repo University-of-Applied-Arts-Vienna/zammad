@@ -21548,6 +21548,10 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/user.coffee:167
+msgid "Users online: %s"
+msgstr ""
+
 #: app/frontend/apps/mobile/pages/search/plugins/user.ts:10
 msgid "Users with \"%s\""
 msgstr ""

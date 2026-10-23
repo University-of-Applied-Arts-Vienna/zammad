@@ -98,6 +98,75 @@ RSpec.describe Channel::Filter::FollowUpGroupCheck, type: :channel_filter do
       end
     end
 
+    context 'when the receiving group was requested from the detected ticket before' do
+      let(:requested_ticket) { create(:ticket, group: group_b) }
+      let(:message_id)       { "<#{SecureRandom.uuid}@zammad.example.com>" }
+
+      # An agent emailed group B from the ticket before, group B got its own ticket with
+      # the imported copy. Now another agent writes a new mail (no references) to group B.
+      before do
+        create(:ticket_article, :outbound_email, ticket:, message_id:, created_at: 1.hour.ago)
+        create(:ticket_article, :inbound_email, ticket: requested_ticket, message_id:)
+      end
+
+      it 'threads the mail into the requested ticket' do
+        filter(mail_hash, channel:)
+
+        expect(mail_hash).to include('x-zammad-ticket-id': requested_ticket.id)
+      end
+
+      it 'prefers the ticket requested most recently' do
+        newer_ticket = create(:ticket, group: group_b)
+        newer_message_id = "<#{SecureRandom.uuid}@zammad.example.com>"
+        create(:ticket_article, :outbound_email, ticket:, message_id: newer_message_id)
+        create(:ticket_article, :inbound_email, ticket: newer_ticket, message_id: newer_message_id)
+
+        filter(mail_hash, channel:)
+
+        expect(mail_hash).to include('x-zammad-ticket-id': newer_ticket.id)
+      end
+
+      context 'when the requested ticket was merged' do
+        let(:target_ticket) { create(:ticket, group: group_b) }
+
+        before { requested_ticket.merge_to(ticket_id: target_ticket.id, user_id: 1) }
+
+        it 'threads the mail into the merge target' do
+          filter(mail_hash, channel:)
+
+          expect(mail_hash).to include('x-zammad-ticket-id': target_ticket.id)
+        end
+      end
+
+      context 'when the matching article of the detected ticket was received, not sent' do
+        before { ticket.articles.each { |article| article.update!(sender: Ticket::Article::Sender.lookup(name: 'Customer')) } }
+
+        it 'drops the follow-up association so a new ticket gets created' do
+          filter(mail_hash, channel:)
+
+          expect(mail_hash).to include('x-zammad-ticket-id': nil)
+        end
+      end
+    end
+
+    context 'when the detected ticket was requested from a ticket of the receiving group' do
+      let(:origin_ticket) { create(:ticket, group: group_b) }
+      let(:message_id)    { "<#{SecureRandom.uuid}@zammad.example.com>" }
+
+      # Group B emailed group A from its ticket, group A got the detected ticket. Now an
+      # agent of group A writes a new mail (no references) from it to group B.
+      before do
+        create(:ticket_article, :outbound_email, ticket: origin_ticket, message_id:, created_at: 1.hour.ago)
+        create(:ticket_article, :inbound_email, ticket:, message_id:)
+      end
+
+      it 'threads the mail into the origin ticket' do
+        filter(mail_hash, channel:)
+
+        expect(mail_hash).to include('x-zammad-ticket-id': origin_ticket.id)
+      end
+    end
+
     context 'when the mail only references tickets of other groups' do
       let(:mail_hash) do
         {

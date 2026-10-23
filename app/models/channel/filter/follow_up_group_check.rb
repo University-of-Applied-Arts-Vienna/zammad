@@ -15,6 +15,12 @@ module Channel::Filter::FollowUpGroupCheck
   # the subject hook of the answering group's ticket, but references the mail the
   # requesting group sent, so it gets threaded into the requesting group's ticket.
   #
+  # Without a matching reference, a ticket of the receiving group which is related to the
+  # detected ticket by a request between the groups is used. This is the case when any
+  # agent writes a new mail (not a reply) from the requesting ticket to the requested
+  # group, or the other way round: everything sent from one ticket to the other group
+  # lands in the same ticket there.
+  #
   # Runs after the regular follow-up detection (FollowUpCheck/FollowUpPossibleCheck) and
   # before IdentifyGroup, so clearing the follow-up id makes IdentifyGroup fall back to
   # the receiving group.
@@ -40,9 +46,9 @@ module Channel::Filter::FollowUpGroupCheck
     mail[:'x-zammad-ticket-id']     = nil
     mail[:'x-zammad-ticket-number'] = nil
 
-    referenced_ticket = referenced_ticket_in_group(mail, receiving_group)
+    referenced_ticket = referenced_ticket_in_group(mail, receiving_group) || related_ticket_in_group(ticket, receiving_group)
     if referenced_ticket
-      Rails.logger.debug { "Follow-up for '##{ticket.number}' redirected: detected group ##{ticket.group_id} differs from receiving group ##{receiving_group.id}, using referenced ticket '##{referenced_ticket.number}'." }
+      Rails.logger.debug { "Follow-up for '##{ticket.number}' redirected: detected group ##{ticket.group_id} differs from receiving group ##{receiving_group.id}, using related ticket '##{referenced_ticket.number}'." }
 
       follow_up_referenced_ticket(channel, mail, transaction_params, referenced_ticket)
     else
@@ -69,6 +75,32 @@ module Channel::Filter::FollowUpGroupCheck
       .joins(:articles)
       .where(group_id: group.id, ticket_articles: { message_id_md5: message_id_md5s })
       .reorder('ticket_articles.created_at DESC, ticket_articles.id DESC')
+      .first
+  end
+
+  # Finds the ticket of the given group which is related to the given ticket by a request
+  # between the groups (see Transaction::InterGroupNoteCopy):
+  #
+  # - the ticket the given ticket was requested from, or
+  # - the most recent ticket requested from the given ticket, i.e. which holds the
+  #   imported copy of an email an agent sent from the given ticket.
+  def self.related_ticket_in_group(ticket, group)
+    origin_ticket = Transaction::InterGroupNoteCopy.origin_ticket(ticket)
+    return origin_ticket if origin_ticket&.group_id == group.id
+
+    sent_message_id_md5s = ticket.articles
+      .where(
+        sender_id: Ticket::Article::Sender.lookup(name: 'Agent').id,
+        type_id:   Ticket::Article::Type.lookup(name: 'email').id,
+      )
+      .where.not(message_id_md5: nil)
+      .select(:message_id_md5)
+
+    Ticket
+      .joins(:articles)
+      .where(group_id: group.id, ticket_articles: { message_id_md5: sent_message_id_md5s })
+      .where.not(id: ticket.id)
+      .reorder(id: :desc)
       .first
   end
 

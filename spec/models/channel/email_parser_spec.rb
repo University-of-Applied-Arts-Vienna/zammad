@@ -1486,6 +1486,36 @@ RSpec.describe Channel::EmailParser, type: :model do
               .and not_change { ticket.articles.reload.length }
           end
         end
+
+        context 'when several agents write new mails from a ticket to the receiving group' do
+          let(:agents) { create_list(:agent, 2, groups: [group_a]) }
+
+          def mail_from(agent)
+            <<~RAW.chomp
+              From: #{agent.email}
+              To: groupb@example.com
+              Subject: #{ticket_ref} please help
+              Message-ID: <#{SecureRandom.uuid}@zammad.example>
+
+              Lorem ipsum dolor
+            RAW
+          end
+
+          # Mails sent from a ticket are stored there as outgoing articles with the
+          # message id the receiving channel imports.
+          def send_from_ticket(agent)
+            raw = mail_from(agent)
+            create(:ticket_article, :outbound_email, ticket:, message_id: raw[%r{^Message-ID: (.+)$}, 1], created_by: agent)
+            described_class.new.process({}, raw)
+          end
+
+          it 'appends all of them to one ticket of the receiving group' do
+            expect { agents.each { |agent| send_from_ticket(agent) } }
+              .to change(Ticket, :count).by(1)
+
+            expect(Ticket.last).to have_attributes(group: group_b, articles: have_attributes(length: 2))
+          end
+        end
       end
 
       context 'when postmaster_follow_up_new_ticket_for_different_group is disabled (default)' do

@@ -33,4 +33,31 @@ RSpec.describe 'Monitoring', type: :request do
       end
     end
   end
+
+  describe 'GET /api/v1/monitoring/failed_emails' do
+    let(:admin) { create(:admin) }
+    let(:agent) { create(:agent) }
+
+    before do
+      create(:failed_email, channel: create(:email_channel, mail_server_user: 'support@example.com'))
+    end
+
+    context 'when admin', authenticated_as: :admin do
+      it 'returns the failed emails', :aggregate_failures do
+        get '/api/v1/monitoring/failed_emails', as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['total_count']).to eq(1)
+        expect(json_response['failed_emails'].first).to include('account' => 'support@example.com', 'subject' => 'some subject')
+      end
+    end
+
+    context 'when agent', authenticated_as: :agent do
+      it 'does not return results, not even via token' do
+        get "/api/v1/monitoring/failed_emails?token=#{token}", as: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end

@@ -457,6 +457,7 @@ class CreateTicket < ActiveRecord::Migration[4.2]
     add_foreign_key :channels, :groups
     add_foreign_key :channels, :users, column: :created_by_id
     add_foreign_key :channels, :users, column: :updated_by_id
+    add_foreign_key :failed_emails, :channels, on_delete: :nullify
 
     create_table :slas do |t|
       t.references :calendar,                                   null: false

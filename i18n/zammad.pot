@@ -6929,6 +6929,10 @@ msgstr ""
 msgid "Emails before the cut-off time are imported as archived tickets. Emails after the cut-off time are imported as regular tickets."
 msgstr ""
 
+#: app/assets/javascripts/app/views/monitoring/failed_emails.jst.eco:2
+msgid "Emails that could not be processed"
+msgstr ""
+
 #: app/frontend/apps/desktop/components/Form/fields/FieldEditor/useEditorActions.ts:310
 #: app/frontend/shared/components/Form/fields/FieldEditor/features/video-embed/VideoEmbedForm.vue:144
 msgid "Embed video"
@@ -15060,6 +15064,10 @@ msgstr ""
 msgid "Results"
 msgstr ""
 
+#: app/assets/javascripts/app/views/monitoring/failed_emails.jst.eco:20
+msgid "Retries"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/widget/two_factor_configuration/modal/security_keys.coffee:161
 #: app/assets/javascripts/app/views/generic/text_tools_modal.jst.eco:14
 #: app/assets/javascripts/app/views/link/kb_answer.jst.eco:38
@@ -16598,6 +16606,10 @@ msgstr ""
 
 #: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/TicketDetailTopBar/components/TicketInformationFull/TicketInformationBadgeList/ReferencingTicketsBadgePopover.vue:34
 msgid "Show tracking tickets"
+msgstr ""
+
+#: app/assets/javascripts/app/views/monitoring/failed_emails.jst.eco:8
+msgid "Showing the newest %s of %s emails."
 msgstr ""
 
 #: app/assets/javascripts/app/views/integration/cti.jst.eco:101
@@ -19102,6 +19114,10 @@ msgstr ""
 msgid "There are no categories to arrange yet."
 msgstr ""
 
+#: app/assets/javascripts/app/views/monitoring/failed_emails.jst.eco:5
+msgid "There are no emails that could not be processed."
+msgstr ""
+
 #: app/frontend/apps/desktop/pages/personal-setting/views/PersonalSettingLinkedAccounts.vue:40
 msgid "There are no enabled third-party authentication providers."
 msgstr ""
@@ -20343,6 +20359,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/views/translation/description.jst.eco:11
 msgid "To make translations easier you can enable and disable the inline translation feature by pressing \"%s\" at any time."
+msgstr ""
+
+#: app/assets/javascripts/app/views/monitoring/failed_emails.jst.eco:38
+msgid "To process them again, run the following command on the server:"
 msgstr ""
 
 #: app/assets/javascripts/app/views/widget/two_factor_configuration/security_keys/index.jst.eco:3

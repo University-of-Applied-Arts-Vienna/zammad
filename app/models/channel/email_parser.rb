@@ -131,7 +131,7 @@ returns
   def process(channel, msg, exception = true)
     process_with_timeout(channel, msg)
   rescue => e
-    failed_email = ::FailedEmail.create!(data: msg, parsing_error: e)
+    failed_email = ::FailedEmail.create!(data: msg, parsing_error: e, channel: channel.is_a?(Channel) ? channel : nil)
 
     message = <<~MESSAGE.chomp
       Can't process email. Run the following command to get the message for issue report at https://github.com/zammad/zammad/issues:

@@ -1,0 +1,40 @@
+<div class="page-header-title">
+  <h2><% if @totalCount is 0: %><%- @Icon('status', 'ok inline') %><% else: %><%- @Icon('status', 'error inline') %><% end %> <%- @T('Emails that could not be processed') %></h2>
+</div>
+<% if @totalCount is 0: %>
+  <p><%- @T('There are no emails that could not be processed.') %></p>
+<% else: %>
+  <% if @totalCount > @failedEmails.length: %>
+    <p><%- @T('Showing the newest %s of %s emails.', @failedEmails.length, @totalCount) %></p>
+  <% end %>
+  <div class="table-overview">
+    <table class="table table-striped js-failedEmailsTable">
+      <thead>
+        <tr>
+          <th><%- @T('Created at') %></th>
+          <th><%- @T('Email account') %></th>
+          <th><%- @T('From') %></th>
+          <th><%- @T('To') %></th>
+          <th><%- @T('Subject') %></th>
+          <th><%- @T('Error') %></th>
+          <th><%- @T('Retries') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for failedEmail in @failedEmails: %>
+        <tr data-id="<%= failedEmail.id %>">
+          <td><% if failedEmail.created_at: %><%- @humanTime(failedEmail.created_at) %><% end %></td>
+          <td><% if failedEmail.account: %><%= failedEmail.account %><% else: %><%- @T('Unknown') %><% end %></td>
+          <td><%= failedEmail.from %></td>
+          <td><%= failedEmail.to %></td>
+          <td<% if failedEmail.date: %> title="<%= failedEmail.date %>"<% end %>><%= failedEmail.subject %></td>
+          <td class="failed-email-error" title="<%= failedEmail.error %>"><%= failedEmail.error %></td>
+          <td><%= failedEmail.retries %></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <p><%- @T('To process them again, run the following command on the server:') %></p>
+  <pre><code>zammad run rails r 'FailedEmail.reprocess_all'</code></pre>
+<% end %>

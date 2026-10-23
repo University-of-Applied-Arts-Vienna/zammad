@@ -18,6 +18,7 @@ class Monitoring extends App.ControllerSubContent
 
   # fetch data, render view
   load: ->
+    @loadFailedEmails()
     @startLoading()
     @ajax(
       id:    'health_check'
@@ -30,8 +31,27 @@ class Monitoring extends App.ControllerSubContent
         @render()
     )
 
+  loadFailedEmails: ->
+    @ajax(
+      id:    'failed_emails'
+      type:  'GET'
+      url:   "#{@apiPath}/monitoring/failed_emails"
+      success: (data) =>
+        @failedEmails = data
+        @renderFailedEmails()
+    )
+
   render: =>
     @html App.view('monitoring')(data: @data)
+    @renderFailedEmails()
+
+  renderFailedEmails: =>
+    return if !@failedEmails
+
+    @$('.js-failedEmails').html(App.view('monitoring/failed_emails')(
+      totalCount:   @failedEmails.total_count
+      failedEmails: @failedEmails.failed_emails
+    ))
 
   resetToken: (e) =>
     e.preventDefault()

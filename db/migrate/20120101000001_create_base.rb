@@ -958,9 +958,12 @@ class CreateBase < ActiveRecord::Migration[4.2]
     end
 
     create_table :failed_emails do |t|
-      t.binary  :data,         null: false
-      t.integer :retries,      null: false, default: 1
-      t.text    :parsing_error
+      t.binary     :data,         null: false
+      t.integer    :retries,      null: false, default: 1
+      t.text       :parsing_error
+      t.references :channel,      null: true, type: :integer
+
+      t.timestamps limit: 3, null: false
     end
 
     create_table :system_reports do |t|

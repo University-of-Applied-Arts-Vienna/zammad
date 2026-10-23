@@ -1,8 +1,10 @@
 # Copyright (C) 2012-2026 Zammad Foundation, https://zammad-foundation.org/
 
 class FailedEmail < ApplicationModel
+  belongs_to :channel, optional: true
+
   def reprocess(params = {})
-    ticket, _article, _user, _mail = Channel::EmailParser.new.process_with_timeout(params, data)
+    ticket, _article, _user, _mail = Channel::EmailParser.new.process_with_timeout(params.presence || channel || {}, data)
 
     raise __('Unknown error: Could not create a ticket from this email.') if !ticket
 
@@ -33,6 +35,23 @@ class FailedEmail < ApplicationModel
               end
 
     write_attribute :parsing_error, message
+  end
+
+  # Details to identify the email, e.g. for the monitoring page.
+  def summary
+    headers = parsed_headers
+
+    {
+      id:,
+      created_at:,
+      retries:,
+      account:    channel_account,
+      from:       headers[:from],
+      to:         headers[:to],
+      subject:    headers[:subject],
+      date:       headers[:date],
+      error:      parsing_error.to_s.lines.first&.strip,
+    }
   end
 
   def self.by_filepath(filepath)
@@ -102,5 +121,29 @@ class FailedEmail < ApplicationModel
     filepath.unlink
 
     filepath
+  end
+
+  private
+
+  def channel_account
+    return if !channel
+
+    channel.options&.dig(:inbound, :options, :user).presence ||
+      EmailAddress.find_by(channel_id: channel.id)&.email ||
+      "#{channel.area} ##{channel.id}"
+  end
+
+  # Only the header part is parsed, as the full email may be what failed to parse.
+  def parsed_headers
+    header = data.to_s.b.split(%r{\r?\n\r?\n}, 2).first.to_s
+    mail   = Mail.new(header)
+
+    %i[from to subject date].index_with do |field|
+      mail[field]&.decoded.to_s.dup.force_encoding(Encoding::UTF_8).scrub.truncate(250).presence
+    rescue
+      nil
+    end
+  rescue
+    {}
   end
 end

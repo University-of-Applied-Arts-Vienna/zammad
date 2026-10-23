@@ -57,4 +57,6 @@
     <% end %>
   </div>
 
+  <div class="settings-entry js-failedEmails"></div>
+
 </div>

@@ -39,7 +39,64 @@ RSpec.describe FailedEmail, :aggregate_failures, type: :model do
     end
   end
 
+  describe '#summary' do
+    subject(:instance) { create(:failed_email, channel:, parsing_error: "Some error\nsome/backtrace.rb:1") }
+
+    let(:channel) { create(:email_channel, mail_server_user: 'support@example.com') }
+
+    it 'contains the headers, the email account and the first line of the error' do
+      expect(instance.summary).to include(
+        from:    'ME Bob <me@example.com>',
+        to:      'customer@example.com',
+        subject: 'some subject',
+        account: 'support@example.com',
+        error:   'Some error',
+        retries: 1,
+      )
+    end
+
+    context 'without a channel' do
+      let(:channel) { nil }
+
+      it 'has no email account' do
+        expect(instance.summary).to include(account: nil)
+      end
+    end
+
+    context 'with an encoded subject' do
+      subject(:instance) { create(:failed_email, data: "From: me@example.com\nSubject: =?UTF-8?B?#{Base64.strict_encode64('Grüße')}?=\n\nSome Text") }
+
+      it 'decodes the subject' do
+        expect(instance.summary).to include(subject: 'Grüße')
+      end
+    end
+
+    context 'with an invalid email' do
+      subject(:instance) { create(:failed_email, :invalid) }
+
+      it 'has no headers' do
+        expect(instance.summary).to include(from: nil, to: nil, subject: nil)
+      end
+    end
+  end
+
   describe '#reprocess' do
+    context 'when the email came from a channel' do
+      let(:channel) { create(:email_channel) }
+      let(:parser)  { instance_double(Channel::EmailParser, process_with_timeout: [create(:ticket)]) }
+
+      before do
+        instance.update!(channel:)
+        allow(Channel::EmailParser).to receive(:new).and_return(parser)
+      end
+
+      it 'processes the email for that channel again' do
+        instance.reprocess
+
+        expect(parser).to have_received(:process_with_timeout).with(channel, instance.data)
+      end
+    end
+
     context 'when it succeeds' do
       it 'destroys entry' do
         instance.reprocess

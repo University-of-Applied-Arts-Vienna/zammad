@@ -8,5 +8,6 @@ Zammad::Application.routes.draw do
   match api_path + '/monitoring/amount_check',         to: 'monitoring#amount_check',        via: :get
   match api_path + '/monitoring/token',                to: 'monitoring#token',               via: :post
   match api_path + '/monitoring/restart_failed_jobs',  to: 'monitoring#restart_failed_jobs', via: :post
+  match api_path + '/monitoring/failed_emails',        to: 'monitoring#failed_emails',       via: :get
 
 end

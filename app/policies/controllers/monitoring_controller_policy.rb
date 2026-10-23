@@ -23,6 +23,10 @@ class Controllers::MonitoringControllerPolicy < Controllers::ApplicationControll
     monitoring_admin?
   end
 
+  def failed_emails?
+    monitoring_admin?
+  end
+
   private
 
   def token_or_permission?

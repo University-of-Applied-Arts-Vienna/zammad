@@ -137,4 +137,38 @@ curl http://localhost/api/v1/monitoring/amount_check?token=XXX&periode=1h
 
     render json: {}, status: :ok
   end
+
+=begin
+
+Resource:
+GET /api/v1/monitoring/failed_emails
+
+Response:
+{
+  "total_count": 1,
+  "failed_emails": [
+    {
+      "id": 1,
+      "created_at": "2026-10-23T08:00:00.000Z",
+      "retries": 1,
+      "account": "support@example.com",
+      "from": "sender@example.com",
+      "to": "support@example.com",
+      "subject": "Help",
+      "date": "Thu, 23 Oct 2026 10:00:00 +0200",
+      "error": "#<RuntimeError: ...>",
+    },
+  ],
+}
+
+=end
+
+  def failed_emails
+    failed_emails = FailedEmail.includes(:channel).reorder(id: :desc).limit(100)
+
+    render json: {
+      total_count:   FailedEmail.count,
+      failed_emails: failed_emails.map(&:summary),
+    }
+  end
 end

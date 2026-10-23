@@ -2055,6 +2055,14 @@ RSpec.describe Channel::EmailParser, type: :model do
 
         expect(FailedEmail).to be_exist
       end
+
+      it 'saves the channel the email came from' do
+        channel = create(:email_channel)
+
+        parser.process(channel, mail, false)
+
+        expect(FailedEmail.last).to have_attributes(channel:)
+      end
     end
   end
 

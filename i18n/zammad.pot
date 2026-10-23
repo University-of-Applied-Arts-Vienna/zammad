@@ -9218,6 +9218,11 @@ msgstr ""
 msgid "Image text recognition"
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/role.coffee:14
+#: app/assets/javascripts/app/controllers/role.coffee:64
+msgid "Impersonate"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/import.coffee:4
 #: app/assets/javascripts/app/controllers/import_freshdesk.coffee:25
 #: app/assets/javascripts/app/controllers/import_otrs.coffee:20
@@ -13917,6 +13922,10 @@ msgstr ""
 msgid "Please select at least one folder."
 msgstr ""
 
+#: app/services/service/user/prepare_impersonator.rb:31
+msgid "Please select at least one role."
+msgstr ""
+
 #: app/frontend/apps/mobile/pages/home/views/FavoriteTicketOverviewsEdit.vue:69
 msgid "Please select at least one ticket overview"
 msgstr ""
@@ -15902,6 +15911,10 @@ msgstr ""
 #: app/frontend/apps/desktop/pages/ticket/components/TicketDetailView/ArticleBubble/ArticleBubbleBody.vue:166
 #: app/frontend/apps/mobile/pages/ticket/components/TicketDetailView/ArticleBubble.vue:269
 msgid "See more"
+msgstr ""
+
+#: app/assets/javascripts/app/views/role/impersonate.jst.eco:1
+msgid "See the interface with the selected roles, as an agent or as a customer. You switch to an account of your own, so no real user is affected. It is deactivated again when you switch back."
 msgstr ""
 
 #: app/assets/javascripts/app/views/profile/calendar_subscriptions.jst.eco:9
@@ -18260,6 +18273,10 @@ msgstr ""
 
 #: app/services/service/avatar/image_validate.rb:16
 msgid "The image is invalid."
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/role.coffee:122
+msgid "The impersonation could not be started."
 msgstr ""
 
 #: app/assets/javascripts/app/controllers/_integration/pgp.coffee:39

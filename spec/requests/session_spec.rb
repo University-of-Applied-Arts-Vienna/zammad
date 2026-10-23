@@ -43,6 +43,72 @@ RSpec.describe 'Sessions endpoints', type: :request do
     end
   end
 
+  describe 'impersonating roles' do
+    let(:admin)    { create(:admin) }
+    let(:customer) { Role.find_by(name: 'Customer') }
+    let(:params)   { { role_ids: [customer.id], firstname: 'Preview', lastname: 'Account', email: 'preview@example.com' } }
+
+    let(:impersonator) { User.find_by(login: "impersonator-#{admin.id}") }
+
+    context 'when admin' do
+      before do
+        authenticated_as(admin, via: :browser)
+      end
+
+      it 'lists the roles and no account before the first impersonation' do
+        get '/api/v1/sessions/impersonator', as: :json
+
+        expect(json_response['user']).to be_nil
+        expect(json_response['roles']).to include(include('id' => customer.id, 'name' => 'Customer'))
+      end
+
+      it 'switches to the impersonator with the given roles', :aggregate_failures do
+        post '/api/v1/sessions/impersonate', params:, as: :json
+        expect(response).to have_http_status(:ok)
+
+        get '/api/v1/users/me', as: :json
+        expect(json_response).to include('login' => "impersonator-#{admin.id}", 'role_ids' => [customer.id])
+      end
+
+      it 'deactivates the impersonator when switching back', :aggregate_failures do
+        post '/api/v1/sessions/impersonate', params:, as: :json
+        get '/api/v1/sessions/switch_back', as: :json
+
+        expect(impersonator).to have_attributes(active: false)
+
+        get '/api/v1/users/me', as: :json
+        expect(json_response).to include('id' => admin.id)
+      end
+
+      it 'prefills the account on the next impersonation' do
+        post '/api/v1/sessions/impersonate', params:, as: :json
+        get '/api/v1/sessions/switch_back', as: :json
+
+        get '/api/v1/sessions/impersonator', as: :json
+        expect(json_response['user']).to include('firstname' => 'Preview', 'email' => 'preview@example.com')
+      end
+
+      it 'refuses an impersonation without roles' do
+        post '/api/v1/sessions/impersonate', params: params.merge(role_ids: []), as: :json
+
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    context 'when agent' do
+      before do
+        authenticated_as(create(:agent), via: :browser)
+      end
+
+      it 'is not allowed', :aggregate_failures do
+        post '/api/v1/sessions/impersonate', params:, as: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(impersonator).to be_nil
+      end
+    end
+  end
+
   describe 'multiple consecutive switches' do
     let(:admin)       { create(:admin) }
     let(:other_admin) { create(:admin) }

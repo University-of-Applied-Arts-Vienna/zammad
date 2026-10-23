@@ -3,7 +3,7 @@
 class SessionsController < ApplicationController
   include HandlesOidcAuthorization
 
-  prepend_before_action :authenticate_and_authorize!, only: %i[switch_to_user list delete]
+  prepend_before_action :authenticate_and_authorize!, only: %i[switch_to_user impersonator switch_to_impersonator list delete]
   skip_before_action :verify_csrf_token, only: %i[show destroy
                                                   create_omniauth failure_omniauth
                                                   saml_destroy]
@@ -188,21 +188,37 @@ class SessionsController < ApplicationController
 
     raise Exceptions::UnprocessableContent, __('User is inactive.') if !user.active
 
-    # remember original user
-    session[:switched_from_user_id] ||= current_user.id
+    switch_session_to(user)
 
-    # log new session
-    user.activity_stream_log('switch to', current_user.id, true)
+    render(
+      json: {
+        success:  true,
+        location: '',
+      },
+    )
+  end
 
-    AuditLog.create!(
-      action_type:    'switch_to',
-      auditable:      user,
-      auditable_name: "#{current_user.fullname} → #{user.fullname}",
-      user_id:        current_user.id,
+  # The account the current admin impersonates, and the roles it can be given.
+  def impersonator
+    user = Service::User::PrepareImpersonator.find_for(current_user)
+
+    render json: {
+      user:  user&.slice(:firstname, :lastname, :email),
+      roles: Role.where(active: true).reorder(:name).map { |role| role.slice(:id, :name) },
+    }
+  end
+
+  # "switch" to the own impersonator account with the given roles
+  def switch_to_impersonator
+    user = Service::User::PrepareImpersonator.execute(
+      current_user: current_user,
+      role_ids:     Array(params[:role_ids]),
+      firstname:    params[:firstname],
+      lastname:     params[:lastname],
+      email:        params[:email],
     )
 
-    # set session user
-    current_user_set(user)
+    switch_session_to(user)
 
     render(
       json: {
@@ -245,6 +261,11 @@ class SessionsController < ApplicationController
       auditable_name: "#{current_session_user.fullname} → #{user.fullname}",
       user_id:        user.id,
     )
+
+    # An impersonator is only active while being impersonated, so it does not show up as an agent.
+    if Service::User::PrepareImpersonator.impersonator?(current_session_user)
+      current_session_user.update!(active: false)
+    end
 
     render(
       json: {
@@ -307,6 +328,24 @@ class SessionsController < ApplicationController
   end
 
   private
+
+  def switch_session_to(user)
+    # remember original user
+    session[:switched_from_user_id] ||= current_user.id
+
+    # log new session
+    user.activity_stream_log('switch to', current_user.id, true)
+
+    AuditLog.create!(
+      action_type:    'switch_to',
+      auditable:      user,
+      auditable_name: "#{current_user.fullname} → #{user.fullname}",
+      user_id:        current_user.id,
+    )
+
+    # set session user
+    current_user_set(user)
+  end
 
   def verify_sso_trusted_ip!
     trusted_ips = Auth::Sso::TrustedIps.new(Setting.get('auth_sso_trusted_ips'))

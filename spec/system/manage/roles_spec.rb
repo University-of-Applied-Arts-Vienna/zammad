@@ -131,4 +131,32 @@ RSpec.describe 'Manage > Role', type: :system do
       end
     end
   end
+
+  context 'when impersonating a role', authenticated_as: :admin, authentication_type: :form do
+    let(:admin)         { create(:admin) }
+    let(:customer_role) { Role.find_by(name: 'Customer') }
+
+    it 'switches to an own account with that role and back' do
+      visit 'manage/roles'
+
+      click '[data-type=impersonate]'
+
+      in_modal do
+        find("div[data-attribute-name='role_ids'] div.js-pool div[data-value='#{customer_role.id}']").click
+        fill_in 'firstname', with: 'Preview'
+        fill_in 'lastname',  with: 'Account'
+        fill_in 'email',     with: 'preview@example.com'
+        click_on 'Impersonate'
+      end
+
+      expect(page).to have_text('Zammad looks like this for "Preview Account"')
+      expect(current_user).to have_attributes(login: "impersonator-#{admin.id}", roles: [customer_role])
+
+      click '.switchBackToUser-close'
+
+      expect(page).to have_no_text('Zammad looks like this for')
+      expect(current_user).to eq(admin)
+      expect(User.find_by(login: "impersonator-#{admin.id}")).to have_attributes(active: false)
+    end
+  end
 end

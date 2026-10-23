@@ -1,0 +1,1 @@
+<p><%- @T('See the interface with the selected roles, as an agent or as a customer. You switch to an account of your own, so no real user is affected. It is deactivated again when you switch back.') %></p>
